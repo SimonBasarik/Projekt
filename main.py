@@ -21,15 +21,8 @@ font = pygame.font.Font('Font\\rainyhearts.ttf', 50)
 
 
 
-buttonStart = pygame.draw.rect(screen,mainButtonColor,(buttonStartWIDTH,buttonStartHEIGHT, 140,50))
-buttonStartText = font.render('START', True, fontButtonColor)
-
-screen.blit(buttonStartText, (buttonStartWIDTH,buttonStartHEIGHT))
-
-buttonQuit = pygame.draw.rect(screen,mainButtonColor,(buttonQuitWIDTH,buttonQuitHEIGHT, 140,50))
-buttonQuitText = font.render('QUIT', True, fontButtonColor)
-
-screen.blit(buttonQuitText, (buttonQuitWIDTH + 18,buttonQuitHEIGHT))
+pygame.mouse.set_visible(False)
+cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 
 running = True
 while running:
@@ -41,7 +34,23 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_click = True
 
+    screen.fill((0, 0, 0))
+
+    buttonStart = pygame.draw.rect(screen, mainButtonColor, (buttonStartWIDTH, buttonStartHEIGHT, 140, 50))
+    buttonStartText = font.render('START', True, fontButtonColor)
+
+    screen.blit(buttonStartText, (buttonStartWIDTH, buttonStartHEIGHT))
+
+    buttonQuit = pygame.draw.rect(screen, mainButtonColor, (buttonQuitWIDTH, buttonQuitHEIGHT, 140, 50))
+    buttonQuitText = font.render('QUIT', True, fontButtonColor)
+
+    screen.blit(buttonQuitText, (buttonQuitWIDTH + 18, buttonQuitHEIGHT))
+
     if buttonQuit.collidepoint(mouse) and mouse_click:
         running = False
 
+
+
+
+    screen.blit(cursor,mouse)
     pygame.display.update()
