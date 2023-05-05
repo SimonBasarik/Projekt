@@ -1,3 +1,0 @@
-#daco
-#pes
-#halo
