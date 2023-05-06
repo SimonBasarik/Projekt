@@ -6,7 +6,7 @@ res = (1920,1080) #rozlisenie
 
 screen = pygame.display.set_mode(res)
 
-
+clock = pygame.time.Clock()
 
 mainButtonColor = (255,0,0)
 fontButtonColor = (255,255,255)
@@ -54,3 +54,4 @@ while running:
 
     screen.blit(cursor,mouse)
     pygame.display.update()
+    clock.tick(60)
