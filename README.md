@@ -1,2 +1,2 @@
 # Projekt
-Ze vraj mame rovit koncorocny projekt  ¯\_(ツ)_/¯
+Ze vraj mame robit koncorocny projekt  ¯\_(ツ)_/¯
