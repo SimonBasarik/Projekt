@@ -23,7 +23,7 @@ font = pygame.font.Font('Font\\rainyhearts.ttf', 50)
 
 pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
-
+#zaciatok hlavneho skriptu
 running = True
 while running:
     mouse = pygame.mouse.get_pos()
@@ -35,7 +35,7 @@ while running:
             mouse_click = True
 
     screen.fill((0, 0, 0))
-
+    #vykreslovanie
     buttonStart = pygame.draw.rect(screen, mainButtonColor, (buttonStartWIDTH, buttonStartHEIGHT, 140, 50))
     buttonStartText = font.render('START', True, fontButtonColor)
 
@@ -45,7 +45,7 @@ while running:
     buttonQuitText = font.render('QUIT', True, fontButtonColor)
 
     screen.blit(buttonQuitText, (buttonQuitWIDTH + 18, buttonQuitHEIGHT))
-
+    #interakcia s tlacitkami
     if buttonQuit.collidepoint(mouse) and mouse_click:
         running = False
 
