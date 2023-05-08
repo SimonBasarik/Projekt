@@ -49,6 +49,10 @@ while running:
     if buttonQuit.collidepoint(mouse) and mouse_click:
         running = False
 
+    if buttonStart.collidepoint(mouse) and mouse_click:
+        with open("level1.py") as f:
+            exec(f.read())
+
 
 
 
