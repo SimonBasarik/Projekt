@@ -9,6 +9,11 @@ res = (1920,1080) #rozlisenie
 
 screen = pygame.display.set_mode(res)
 
+bg_image = pygame.image.load('levely\\level1.png')
+bg_imageWIDTH = bg_image.get_rect().width
+bg_imageHEIGHT = bg_image.get_rect().height
+backGround = pygame.transform.scale(bg_image, (bg_imageWIDTH*3,bg_imageHEIGHT*3))
+
 pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 
@@ -23,6 +28,7 @@ def playerIcon(x,y):
 running = True
 while running:
     screen.fill((0, 0, 0))
+    screen.blit(backGround, (0,0))
     mouse = pygame.mouse.get_pos()
     mouse_click = False
     for event in pygame.event.get():
