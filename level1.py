@@ -19,8 +19,8 @@ cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 
 clock = pygame.time.Clock()
 
-playerPositionX = 100
-playerPositionY = 100
+playerPositionX = 910
+playerPositionY = 540
 def playerIcon(x,y):
     return pygame.Rect(int(x),int(y), 50, 50)
 
