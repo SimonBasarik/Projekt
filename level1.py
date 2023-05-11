@@ -36,17 +36,22 @@ while running:
             running = False
 
     #pohyb hraca
-    pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_w]:
+    key_pressed = pygame.key.get_pressed()
+    pressed = False
+    if key_pressed[pygame.K_w] and pressed == False:
+        pressed = True
         playerPositionY -= PLAYER_SPEED
 
-    if pressed[pygame.K_s]:
+    if key_pressed[pygame.K_s] and pressed == False:
+        pressed = True
         playerPositionY += PLAYER_SPEED
 
-    if pressed[pygame.K_a]:
+    if key_pressed[pygame.K_a] and pressed == False:
+        pressed = True
         playerPositionX -= PLAYER_SPEED
 
-    if pressed[pygame.K_d]:
+    if key_pressed[pygame.K_d] and pressed == False:
+        pressed = True
         playerPositionX += PLAYER_SPEED
     #vykreslovanie
     player = pygame.draw.rect(screen, (255, 255, 255), playerIcon(playerPositionX, playerPositionY))
