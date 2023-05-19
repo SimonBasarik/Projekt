@@ -37,6 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect = [self.playerPositionX,self.playerPositionY]
 
+
     def animate(self):
         self.is_animating = True
 
@@ -50,6 +51,7 @@ class Player(pygame.sprite.Sprite):
             self.imageWIDTH = self.image.get_rect().width
             self.imageHEIGTH = self.image.get_rect().height
             self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGTH * 3))
+            self.rect = [self.playerPositionX,self.playerPositionY]
 
     def movement(self):
         self.key_pressed = pygame.key.get_pressed()
