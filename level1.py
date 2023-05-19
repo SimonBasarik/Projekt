@@ -20,27 +20,32 @@ clock = pygame.time.Clock()
 
 
 class Player(pygame.sprite.Sprite):
+    #init funkcia
     def __init__(self,):
         super().__init__()
+        #player premenne
         self.PLAYER_SPEED = 6
         self.playerPositionX = 910
         self.playerPositionY = 540
+        #player sprite nacitanie do listu
         self.sprites = []
         self.is_animating = False
         for i in range(4):
             self.sprites.append(pygame.image.load(f"sprites\\run\\knight_m_run_anim_f{i}.png"))
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]
+        #transformovanie spritu
         self.imageWIDTH = self.image.get_rect().width
         self.imageHEIGTH = self.image.get_rect().height
         self.image = pygame.transform.scale(self.image, (self.imageWIDTH*3,self.imageHEIGTH*3))
+
         self.rect = self.image.get_rect()
         self.rect = [self.playerPositionX,self.playerPositionY]
 
-
+    #funkcia na spustenie animacie
     def animate(self):
         self.is_animating = True
-
+    #prechadzanie png z listu
     def update(self):
         if self.is_animating == True:
             self.current_sprite += 0.5
@@ -52,7 +57,7 @@ class Player(pygame.sprite.Sprite):
             self.imageHEIGTH = self.image.get_rect().height
             self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGTH * 3))
             self.rect = [self.playerPositionX,self.playerPositionY]
-
+    #pogyb hraca
     def movement(self):
         self.key_pressed = pygame.key.get_pressed()
         self.pressed = False
@@ -76,12 +81,12 @@ class Player(pygame.sprite.Sprite):
             self.pressed = True
             self.playerPositionX += self.PLAYER_SPEED
 
-
-
+#pridanie spritu do sprite groupu
 moving_sprites = pygame.sprite.Group()
 player = Player()
 moving_sprites.add(player)
 
+#main loop
 running = True
 while running:
     screen.fill((0, 0, 0))
@@ -95,6 +100,7 @@ while running:
     #pohyb hraca
 
     player.movement()
+
     #vykreslovanie
     moving_sprites.draw(screen)
     moving_sprites.update()
