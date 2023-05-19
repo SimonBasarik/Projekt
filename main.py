@@ -19,8 +19,6 @@ buttonStartHEIGHT = 480
 font = pygame.font.Font('Font\\rainyhearts.ttf', 50)
 
 
-
-
 pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 #zaciatok hlavneho skriptu
@@ -52,8 +50,6 @@ while running:
     if buttonStart.collidepoint(mouse) and mouse_click:
         with open("level1.py") as f:
             exec(f.read())
-
-
 
 
     screen.blit(cursor,mouse)

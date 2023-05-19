@@ -3,7 +3,6 @@ import pygame
 pygame.init()
 
 #pociatocne nastavenie (premenne,konstanty,funkcie)
-PLAYER_SPEED = 5
 
 res = (1920,1080) #rozlisenie
 
@@ -19,12 +18,68 @@ cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 
 clock = pygame.time.Clock()
 
-playerPositionX = 910
-playerPositionY = 540
-def playerIcon(x,y):
-    return pygame.Rect(int(x),int(y), 50, 50)
 
-#zaciatok hlavneho skriptu
+class Player(pygame.sprite.Sprite):
+    def __init__(self,):
+        super().__init__()
+        self.PLAYER_SPEED = 5
+        self.playerPositionX = 910
+        self.playerPositionY = 540
+        self.sprites = []
+        self.is_animating = False
+        for i in range(4):
+            self.sprites.append(pygame.image.load(f"sprites\\run\\knight_m_run_anim_f{i}.png"))
+        self.current_sprite = 0
+        self.image = self.sprites[self.current_sprite]
+        self.imageWIDTH = self.image.get_rect().width
+        self.imageHEIGTH = self.image.get_rect().height
+        self.image = pygame.transform.scale(self.image, (self.imageWIDTH*3,self.imageHEIGTH*3))
+        self.rect = self.image.get_rect()
+        self.rect = [self.playerPositionX,self.playerPositionY]
+
+    def animate(self):
+        self.is_animating = True
+
+    def update(self):
+        if self.is_animating == True:
+            self.current_sprite += 0.3
+            if self.current_sprite >= len(self.sprites):
+                self.current_sprite = 0
+                self.is_animating = False
+            self.image = self.sprites[int(self.current_sprite)]
+            self.imageWIDTH = self.image.get_rect().width
+            self.imageHEIGTH = self.image.get_rect().height
+            self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGTH * 3))
+
+    def movement(self):
+        self.key_pressed = pygame.key.get_pressed()
+        self.pressed = False
+        if self.key_pressed[pygame.K_w] and self.pressed == False:
+            player.animate()
+            self.pressed = True
+            self.playerPositionY -= self.PLAYER_SPEED
+
+        if self.key_pressed[pygame.K_s] and self.pressed == False:
+            player.animate()
+            self.pressed = True
+            self.playerPositionY += self.PLAYER_SPEED
+
+        if self.key_pressed[pygame.K_a] and self.pressed == False:
+            player.animate()
+            self.pressed = True
+            self.playerPositionX -= self.PLAYER_SPEED
+
+        if self.key_pressed[pygame.K_d] and self.pressed == False:
+            player.animate()
+            self.pressed = True
+            self.playerPositionX += self.PLAYER_SPEED
+
+
+
+moving_sprites = pygame.sprite.Group()
+player = Player()
+moving_sprites.add(player)
+
 running = True
 while running:
     screen.fill((0, 0, 0))
@@ -36,25 +91,11 @@ while running:
             running = False
 
     #pohyb hraca
-    key_pressed = pygame.key.get_pressed()
-    pressed = False
-    if key_pressed[pygame.K_w] and pressed == False:
-        pressed = True
-        playerPositionY -= PLAYER_SPEED
 
-    if key_pressed[pygame.K_s] and pressed == False:
-        pressed = True
-        playerPositionY += PLAYER_SPEED
-
-    if key_pressed[pygame.K_a] and pressed == False:
-        pressed = True
-        playerPositionX -= PLAYER_SPEED
-
-    if key_pressed[pygame.K_d] and pressed == False:
-        pressed = True
-        playerPositionX += PLAYER_SPEED
+    player.movement()
     #vykreslovanie
-    player = pygame.draw.rect(screen, (255, 255, 255), playerIcon(playerPositionX, playerPositionY))
+    moving_sprites.draw(screen)
+    moving_sprites.update()
     screen.blit(cursor, mouse)
     pygame.display.flip()
     clock.tick(60)
