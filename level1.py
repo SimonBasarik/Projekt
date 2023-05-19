@@ -22,7 +22,7 @@ clock = pygame.time.Clock()
 class Player(pygame.sprite.Sprite):
     def __init__(self,):
         super().__init__()
-        self.PLAYER_SPEED = 5
+        self.PLAYER_SPEED = 6
         self.playerPositionX = 910
         self.playerPositionY = 540
         self.sprites = []
@@ -43,7 +43,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         if self.is_animating == True:
-            self.current_sprite += 0.3
+            self.current_sprite += 0.5
             if self.current_sprite >= len(self.sprites):
                 self.current_sprite = 0
                 self.is_animating = False
