@@ -37,8 +37,13 @@ def renderMainG():
 
 
 # funkcia renderfight(), vykresluje a stara sa o hlavne vlastnosti suboja
-
+draw_mainButtons = True
+draw_magicButtons = False
+draw_itemButtons = False
 def renderfight():
+    global draw_mainButtons
+    global draw_magicButtons
+    global draw_itemButtons
     global mainG
     mouse = pygame.mouse.get_pos()
     mainscreen.fill((28, 28, 28))
@@ -47,23 +52,46 @@ def renderfight():
     timerS = player.timer / 1000
 
     # vykreslenie hraca a animacia
+    def enemyTurn():
+        player.Health -= 5
+
 
     player.updateIdle()
     goblin.updateIdle()
 
     # volanie funkcii tlacidiel
-
-    if attackButton.draw():
-        if timerS >= TIMERMAXTIME:
-            goblin.Health -= 10
-            player.timer = 0
-    if defendButton.draw():
-        print("DEFENDED")
-    if magicButton.draw():
-        print("MAGICGED")
-    if itemButton.draw():
-        print("ITEMED")
+    if draw_mainButtons:
+        if attackButton.draw():
+            if timerS >= TIMERMAXTIME:
+                goblin.Health -= 10
+                player.timer = 0
+                enemyTurn()
+        if defendButton.draw():
+            print("DEFENDED")
+        if magicButton.draw():
+            draw_mainButtons = False
+            draw_magicButtons = True
+        if itemButton.draw():
+            draw_mainButtons = False
+            draw_itemButtons = True
     timerText.draw()
+    if draw_magicButtons == True:
+        if fireballButton.draw():
+            if timerS >= TIMERMAXTIME:
+                goblin.Health -= 20
+                player.timer = 0
+                enemyTurn()
+                draw_magicButtons = False
+                draw_mainButtons = True
+        if frostfangButton.draw():
+            if timerS >= TIMERMAXTIME:
+                goblin.Health -= 20
+                player.timer = 0
+                enemyTurn()
+                draw_magicButtons = False
+                draw_mainButtons = True
+    if draw_itemButtons == True:
+        pass
 
     # vykreslenie HealthBaru
     goblin.Healthbar.draw(mainscreen, goblin.Health)
@@ -162,6 +190,7 @@ class Enemy(pygame.sprite.Sprite):
         if enemyType == 1:
             for i in range(2):
                 self.sprites.append(pygame.image.load(f"sprites\\goblin\\goblin_idle_anim_f{i}.png").convert_alpha())
+            self.enemyAttack = 5
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]
 
@@ -413,6 +442,8 @@ class Button():
 # Vytvorenie objektov z classy Button(), n# astavenie parametrov (x, y, text tlacitka, velkost fontu)
 
 attackButton = Button(100, 725, "ATTACK", 125)
+fireballButton = Button(100, 725, "FIREBALL", 125)
+frostfangButton = Button(100, 900, "FROSTFANG", 125)
 defendButton = Button(100, 900, "DEFEND", 125)
 magicButton = Button(700, 725, "MAGIC", 125)
 itemButton = Button(740, 900, "ITEM", 125)
