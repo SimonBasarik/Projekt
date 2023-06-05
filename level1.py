@@ -24,15 +24,8 @@ clock = pygame.time.Clock()
 
 def renderMainG():
 
-    # pohyb hraca
-
-    # player.movement()
-
-    # vykreslenie enemy (zatial iba takto, neskôr bude riesene cez classu)
-
-    # mainscreen.blit(enemy, (910, 950))
-
     #vykreslenie hraca a animacia
+
     moving_sprites.draw(mainscreen)
     moving_sprites.update()
 
@@ -106,6 +99,7 @@ class Walls(pygame.sprite.Sprite):
         self.imageHEIGHT = self.image.get_rect().height
         self.image = pygame.transform.scale(self.image,(self.imageWIDTH*3,self.imageHEIGHT*3))
         self.rect = self.image.get_rect(topleft=pos)
+        self.old_rect = self.rect.copy()
 
 #pridanie stien a podlahy do ich vlastných groupov
 
@@ -121,7 +115,7 @@ for layer in level1.visible_layers:
     if layer.name == "walls":
         for x, y, surf in layer.tiles():
             pos = (x * 48, y * 48)
-            Floor(pos=pos, surf=surf, groups=wallGroup)
+            Walls(pos=pos, surf=surf, groups=wallGroup)
 
 #classa Healthbar, vytvara health bar nad hracom a enemy
 
@@ -205,10 +199,11 @@ class Player(pygame.sprite.Sprite):
 
     # init metoda
 
-    def __init__(self):
+    def __init__(self,obstacles):
         super().__init__()
 
         # player premenne
+        self.obstacles = obstacles
         self.PLAYER_SPEED = 6
         self.Health = 100
         self.MaxHealth = 100
@@ -243,6 +238,8 @@ class Player(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.rect.center = [self.playerPositionX, self.playerPositionY]
+        self.old_rect = self.rect.copy()
+
         self.pos = pygame.math.Vector2(self.rect.center)
         self.direction = pygame.math.Vector2()
 
@@ -288,14 +285,55 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
+    # metoda collision, kontroluje
+
+    def collision(self,direction):
+        collision_sprites = pygame.sprite.spritecollide(self,self.obstacles,False)
+        if collision_sprites:
+
+            # kontrola horizontalnych kolizii
+
+            if direction == "horizontal":
+                for sprite in collision_sprites:
+
+                    # colizia na pravo
+                    if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
+                        self.rect.right = sprite.rect.left
+                        self.pos.x = self.rect.x
+
+                    # colizia na lavo
+                    if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
+                        self.rect.left = sprite.rect.right
+                        self.pos.x = self.rect.x
+
+            # kontrola verticalnych kolizii
+
+            if direction == "vertical":
+                for sprite in collision_sprites:
+
+                    # colizia na bottom
+                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
+                        self.rect.bottom = sprite.rect.top
+                        self.pos.y = self.rect.y
+
+                    # colizia na top
+                    if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
+                        self.rect.top = sprite.rect.bottom
+                        self.pos.y = self.rect.y
 
     # update funkcia, (zabudovana v Sprite classe), riesi pohyb a animacie
 
     def update(self):
+        self.old_rect = self.rect.copy()
 
         self.input()
 
-        self.pos += self.direction * self.PLAYER_SPEED
+        self.pos.x += self.direction.x * self.PLAYER_SPEED
+        self.rect.x = self.pos.x
+        self.collision("horizontal")
+        self.pos.y += self.direction.y * self.PLAYER_SPEED
+        self.rect.y = self.pos.y
+        self.collision("vertical")
 
         if self.is_animating:
             self.current_sprite += 0.3
@@ -306,8 +344,10 @@ class Player(pygame.sprite.Sprite):
             self.imageWIDTH = self.image.get_rect().width
             self.imageHEIGTH = self.image.get_rect().height
             self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGTH * 3))
-            self.rect.center = [self.pos.x, self.pos.y]
-        
+            #self.rect.center = [self.pos.x, self.pos.y]
+            self.rect.x = self.pos.x
+            self.rect.y = self.pos.y
+
     # idle update, animuje idle animaciu pri fighte
 
     def updateIdle(self):
@@ -374,7 +414,7 @@ timerText = Button(1200,725,"TIMER :",125)
 # pridanie spritu do sprite groupu
 
 moving_sprites = pygame.sprite.GroupSingle()
-player = Player()
+player = Player(wallGroup)
 moving_sprites.add(player)
 
 enemy_sprites = pygame.sprite.Group()
