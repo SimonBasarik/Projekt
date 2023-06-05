@@ -53,7 +53,9 @@ def renderfight():
 
     # vykreslenie hraca a animacia
     def enemyTurn():
-        player.Health -= 5
+        enemyAttack = 5
+        enemyAttack -= player.Ressistance
+        player.Health -= enemyAttack
 
 
     player.updateIdle()
@@ -67,7 +69,11 @@ def renderfight():
                 player.timer = 0
                 enemyTurn()
         if defendButton.draw():
-            print("DEFENDED")
+            if timerS >= TIMERMAXTIME:
+                player.Ressistance = 4
+                enemyTurn()
+
+                player.timer = 0
         if magicButton.draw():
             draw_mainButtons = False
             draw_magicButtons = True
@@ -243,6 +249,7 @@ class Player(pygame.sprite.Sprite):
         self.Health = 100
         self.MaxHealth = 100
         self.Healthbar = Healthbar(300, 215, 250, 25, self.MaxHealth)
+        self.Ressistance = 0
         self.timer = 0
         self.playerPositionX = 960
         self.playerPositionY = 540
