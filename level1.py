@@ -1,4 +1,5 @@
 import pygame
+from pytmx.util_pygame import load_pygame
 
 pygame.init()
 
@@ -7,11 +8,9 @@ pygame.init()
 res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
+level1 = load_pygame("levely/level1.tmx")
 
-bg_image = pygame.image.load('levely\\level1.png').convert_alpha()
-bg_imageWIDTH = bg_image.get_rect().width
-bg_imageHEIGHT = bg_image.get_rect().height
-backGround = pygame.transform.scale(bg_image, (bg_imageWIDTH * 3, bg_imageHEIGHT * 3))
+# maximalny cas timeru
 
 TIMERMAXTIME = 5
 
@@ -27,7 +26,7 @@ def renderMainG():
 
     # pohyb hraca
 
-    player.movement()
+    # player.movement()
 
     # vykreslenie enemy (zatial iba takto, neskôr bude riesene cez classu)
 
@@ -86,6 +85,46 @@ def renderfight():
         mainG = True
     pygame.display.flip()
 
+# classa Floor
+
+class Floor(pygame.sprite.Sprite):
+    def __init__(self,pos,surf,groups):
+        super().__init__(groups)
+        self.image = surf
+        self.imageWIDTH = self.image.get_rect().width
+        self.imageHEIGHT = self.image.get_rect().height
+        self.image = pygame.transform.scale(self.image,(self.imageWIDTH*3,self.imageHEIGHT*3))
+        self.rect = self.image.get_rect(topleft=pos)
+
+# classa Walls
+
+class Walls(pygame.sprite.Sprite):
+    def __init__(self,pos,surf,groups):
+        super().__init__(groups)
+        self.image = surf
+        self.imageWIDTH = self.image.get_rect().width
+        self.imageHEIGHT = self.image.get_rect().height
+        self.image = pygame.transform.scale(self.image,(self.imageWIDTH*3,self.imageHEIGHT*3))
+        self.rect = self.image.get_rect(topleft=pos)
+
+#pridanie stien a podlahy do ich vlastných groupov
+
+floorGroup = pygame.sprite.Group()
+wallGroup = pygame.sprite.Group()
+for layer in level1.visible_layers:
+    if layer.name == "ground":
+        for x, y, surf in layer.tiles():
+            pos = (x * 48, y * 48)
+            Floor(pos=pos, surf=surf, groups=floorGroup)
+
+for layer in level1.visible_layers:
+    if layer.name == "walls":
+        for x, y, surf in layer.tiles():
+            pos = (x * 48, y * 48)
+            Floor(pos=pos, surf=surf, groups=wallGroup)
+
+#classa Healthbar, vytvara health bar nad hracom a enemy
+
 class Healthbar():
     def __init__(self,x,y,w,h,maxhp):
         self.x = x
@@ -93,14 +132,20 @@ class Healthbar():
         self.w = w
         self.h = h
         self.maxhp = maxhp
-    
+
+    # vykreslenie healthbaru
+
     def draw (self, surface,hp):
         ratio = hp / self.maxhp
         pygame.draw.rect(surface,"red", (self.x,self.y,self.w,self.h))
         pygame.draw.rect(surface,"white", (self.x, self.y, self.w*ratio, self.h))
 
+# classa enemy, velmi podobna hracovi len sa neda hybat
 
 class Enemy (pygame.sprite.Sprite):
+
+    # zakladne nastavenie classy enemy
+
     def __init__(self,x,y,enemyType):
         super().__init__()
 
@@ -130,7 +175,9 @@ class Enemy (pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.Rect = self.image.get_rect()
         self.Rect.topleft = (1500,300)
-        self.rect = [self.enemyPositionX, self.enemyPositionY]
+        self.rect.center = [self.enemyPositionX, self.enemyPositionY]
+
+    # update funkcia, (zabudovana v Sprite classe), stara sa o animacie
 
     def update(self):
         self.current_sprite += 0.025
@@ -140,7 +187,7 @@ class Enemy (pygame.sprite.Sprite):
         self.imageWIDTH = self.image.get_rect().width
         self.imageHEIGTH = self.image.get_rect().height
         self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGTH * 3))
-        self.rect = [self.enemyPositionX, self.enemyPositionY]
+        self.rect.center = [self.enemyPositionX, self.enemyPositionY]
 
     def updateIdle(self):
         self.current_sprite += 0.025
@@ -155,17 +202,19 @@ class Enemy (pygame.sprite.Sprite):
         mainscreen.blit(self.filpimage, (self.Rect.x, self.Rect.y))
 
 class Player(pygame.sprite.Sprite):
-    # init funkcia
+
+    # init metoda
+
     def __init__(self):
         super().__init__()
 
         # player premenne
+        self.PLAYER_SPEED = 6
         self.Health = 100
         self.MaxHealth = 100
         self.Healthbar = Healthbar(300,215,250,25, self.MaxHealth)
         self.timer = 0
-        self.PLAYER_SPEED = 6
-        self.playerPositionX = 910
+        self.playerPositionX = 960
         self.playerPositionY = 540
 
         # player sprite nacitanie do listu
@@ -192,17 +241,62 @@ class Player(pygame.sprite.Sprite):
         self.idleImageHEIGTH = self.image.get_rect().height
         self.idleImage = pygame.transform.scale(self.idleImage, (self.idleImageWIDTH * 6, self.idleImageHEIGTH * 6))
 
-        self.rect = self.image.get_rect(topleft=(self.playerPositionX, self.playerPositionY))
+        self.rect = self.image.get_rect()
+        self.rect.center = [self.playerPositionX, self.playerPositionY]
+        self.pos = pygame.math.Vector2(self.rect.center)
+        self.direction = pygame.math.Vector2()
 
         self.idleRect = self.idleImage.get_rect()
         self.idleRect.topleft = (300,100)
 
-    # funkcia na spustenie animacie
+    # metoda na spustenie animacie
+
     def animate(self):
         self.is_animating = True
 
-    # prechadzanie png z listu
+    # input metoda, cita vstup z klaves
+
+    def input(self):
+        keys = pygame.key.get_pressed()
+        self.pressed = False
+
+        # input
+
+        if keys[pygame.K_w] and self.pressed == False:
+            player.animate()
+            self.direction.y = -1
+            self.pressed = True
+
+        elif keys[pygame.K_s] and self.pressed == False:
+            player.animate()
+            self.direction.y = 1
+            self.pressed = True
+
+        else:
+            self.direction.y = 0
+
+        if keys[pygame.K_d] and self.pressed == False:
+            player.animate()
+            self.direction.x = 1
+            self.pressed = True
+
+        elif keys[pygame.K_a] and self.pressed == False:
+            player.animate()
+            self.direction.x = -1
+            self.pressed = True
+
+        else:
+            self.direction.x = 0
+
+
+    # update funkcia, (zabudovana v Sprite classe), riesi pohyb a animacie
+
     def update(self):
+
+        self.input()
+
+        self.pos += self.direction * self.PLAYER_SPEED
+
         if self.is_animating:
             self.current_sprite += 0.3
             if self.current_sprite >= len(self.sprites):
@@ -212,9 +306,10 @@ class Player(pygame.sprite.Sprite):
             self.imageWIDTH = self.image.get_rect().width
             self.imageHEIGTH = self.image.get_rect().height
             self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGTH * 3))
-            self.rect = [self.playerPositionX, self.playerPositionY]
+            self.rect.center = [self.pos.x, self.pos.y]
         
-    
+    # idle update, animuje idle animaciu pri fighte
+
     def updateIdle(self):
         self.current_idleSprite += 0.025
         if self.current_idleSprite >= len(self.idlesprites):
@@ -226,32 +321,8 @@ class Player(pygame.sprite.Sprite):
         self.idleImage = pygame.transform.scale(self.idleImage, (self.idleImageWIDTH * 6, self.idleImageHEIGTH * 6))
         mainscreen.blit(self.idleImage, (self.idleRect.x, self.idleRect.y))
 
+    # metoda drawtimer, vykresluje casovac vo fighte
 
-
-    # pohyb hraca
-    def movement(self):
-        self.key_pressed = pygame.key.get_pressed()
-        self.pressed = False
-        if self.key_pressed[pygame.K_w] and self.pressed == False:
-            player.animate()
-            self.pressed = True
-            self.playerPositionY -= self.PLAYER_SPEED
-
-        if self.key_pressed[pygame.K_s] and self.pressed == False:
-            player.animate()
-            self.pressed = True
-            self.playerPositionY += self.PLAYER_SPEED
-
-        if self.key_pressed[pygame.K_a] and self.pressed == False:
-            player.animate()
-            self.pressed = True
-            self.playerPositionX -= self.PLAYER_SPEED
-
-        if self.key_pressed[pygame.K_d] and self.pressed == False:
-            player.animate()
-            self.pressed = True
-            self.playerPositionX += self.PLAYER_SPEED
-    
     def drawtimer(self):
         timerS = self.timer/1000
     
@@ -262,7 +333,7 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(mainscreen,"white", (1600,745,300*ratio,75))
 
 
-
+#classa Button, vyrvtvara tlacitka
 
 class Button():
 
@@ -302,12 +373,12 @@ itemButton = Button(740,900,"ITEM",125)
 timerText = Button(1200,725,"TIMER :",125)
 # pridanie spritu do sprite groupu
 
-moving_sprites = pygame.sprite.Group()
+moving_sprites = pygame.sprite.GroupSingle()
 player = Player()
 moving_sprites.add(player)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = Enemy(910,950,1)
+goblin = Enemy(960,950,1)
 enemy_sprites.add(goblin)
 
 # Vytvorenie objektov z classy Healthbar(), nastavenie parametrov (x, y, sirka, vyska,maxhp)
@@ -320,19 +391,19 @@ running = True
 mainG = True
 while running:
     mainscreen.fill((0, 0, 0))
-    mainscreen.blit(backGround, (0, 0))
+    floorGroup.draw(mainscreen)
+    wallGroup.draw(mainscreen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # enemy trigger (zatial iba stlacenim klavesy, kedze kolizie nejdu)
-
-    stlacene = pygame.key.get_pressed()
-
-    if stlacene[pygame.K_l]:
+    # enemy trigger
+ 
+    if pygame.sprite.spritecollide(player,enemy_sprites,True):
         mainG = False
 
     # vykreslovanie
+
     if mainG:
         renderMainG()
     else:
