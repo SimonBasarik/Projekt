@@ -8,7 +8,7 @@ pygame.init()
 res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
-level1 = load_pygame("levely/level1.tmx")
+level1 = load_pygame("levely\\level1.tmx")
 
 # maximalny cas timeru
 
