@@ -12,19 +12,18 @@ level1 = load_pygame("levely\\level1.tmx")
 
 # maximalny cas timeru
 
-TIMERMAXTIME = 1
-
+TIMERMAXTIME = 5
 
 pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 
 clock = pygame.time.Clock()
 
-#funkcia renderMainG(), vykresluje a riesi
+
+# funkcia renderMainG(), vykresluje a riesi
 
 def renderMainG():
-
-    #vykreslenie hraca a animacia
+    # vykreslenie hraca a animacia
 
     moving_sprites.draw(mainscreen)
     moving_sprites.update()
@@ -36,72 +35,110 @@ def renderMainG():
     pygame.display.flip()
     clock.tick(60)
 
-# funkcia renderfight(), vykresluje a stara sa o hlavne vlastnosti suboja
 
+# funkcia renderfight(), vykresluje a stara sa o hlavne vlastnosti suboja
+draw_mainButtons = True
+draw_magicButtons = False
+draw_itemButtons = False
 def renderfight():
+    global draw_mainButtons
+    global draw_magicButtons
+    global draw_itemButtons
     global mainG
     mouse = pygame.mouse.get_pos()
     mainscreen.fill((28, 28, 28))
     time = clock.tick(60)
     player.timer += time
-    timerS = player.timer/1000
-    
-    #vykreslenie hraca a animacia
-    
+    timerS = player.timer / 1000
+
+    # vykreslenie hraca a animacia
+    def enemyTurn():
+        enemyAttack = 5
+        enemyAttack -= player.Ressistance
+        player.Health -= enemyAttack
+
+
     player.updateIdle()
     goblin.updateIdle()
-    
-    #volanie funkcii tlacidiel
 
-    if attackButton.draw():
-        if timerS >= TIMERMAXTIME:
-            goblin.Health -= 10
-            player.timer = 0
-    if defendButton.draw():
-        print("DEFENDED")
-    if magicButton.draw():
-        print("MAGICGED")
-    if itemButton.draw():
-        print("ITEMED")
+    # volanie funkcii tlacidiel
+    if draw_mainButtons:
+        if attackButton.draw():
+            if timerS >= TIMERMAXTIME:
+                goblin.Health -= 10
+                player.timer = 0
+                enemyTurn()
+        if defendButton.draw():
+            if timerS >= TIMERMAXTIME:
+                player.Ressistance = 4
+                enemyTurn()
+
+                player.timer = 0
+        if magicButton.draw():
+            draw_mainButtons = False
+            draw_magicButtons = True
+        if itemButton.draw():
+            draw_mainButtons = False
+            draw_itemButtons = True
     timerText.draw()
+    if draw_magicButtons == True:
+        if fireballButton.draw():
+            if timerS >= TIMERMAXTIME:
+                goblin.Health -= 20
+                player.timer = 0
+                enemyTurn()
+                draw_magicButtons = False
+                draw_mainButtons = True
+        if frostfangButton.draw():
+            if timerS >= TIMERMAXTIME:
+                goblin.Health -= 20
+                player.timer = 0
+                enemyTurn()
+                draw_magicButtons = False
+                draw_mainButtons = True
+    if draw_itemButtons == True:
+        pass
 
-    #vykreslenie HealthBaru
-    goblin.Healthbar.draw(mainscreen,goblin.Health)
-    player.Healthbar.draw(mainscreen,player.Health)
+    # vykreslenie HealthBaru
+    goblin.Healthbar.draw(mainscreen, goblin.Health)
+    player.Healthbar.draw(mainscreen, player.Health)
     player.drawtimer()
     mainscreen.blit(cursor, mouse)
-    if player.Health <=0:
+    if player.Health <= 0:
         mainG = True
         player.Health = 20
-    
+
     if goblin.Health <= 0:
         mainG = True
     pygame.display.flip()
 
+
 # classa Floor
 
 class Floor(pygame.sprite.Sprite):
-    def __init__(self,pos,surf,groups):
+    def __init__(self, pos, surf, groups):
         super().__init__(groups)
         self.image = surf
         self.imageWIDTH = self.image.get_rect().width
         self.imageHEIGHT = self.image.get_rect().height
-        self.image = pygame.transform.scale(self.image,(self.imageWIDTH*3,self.imageHEIGHT*3))
+        self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGHT * 3))
         self.rect = self.image.get_rect(topleft=pos)
+
 
 # classa Walls
 
 class Walls(pygame.sprite.Sprite):
-    def __init__(self,pos,surf,groups):
+    def __init__(self, pos, surf, groups):
         super().__init__(groups)
         self.image = surf
         self.imageWIDTH = self.image.get_rect().width
         self.imageHEIGHT = self.image.get_rect().height
-        self.image = pygame.transform.scale(self.image,(self.imageWIDTH*3,self.imageHEIGHT*3))
+        self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGHT * 3))
         self.rect = self.image.get_rect(topleft=pos)
         self.old_rect = self.rect.copy()
 
-#pridanie stien a podlahy do ich vlastných groupov
+
+# pridanie stien a podlahy do ich vlastných groupov
 
 floorGroup = pygame.sprite.Group()
 wallGroup = pygame.sprite.Group()
@@ -117,10 +154,11 @@ for layer in level1.visible_layers:
             pos = (x * 48, y * 48)
             Walls(pos=pos, surf=surf, groups=wallGroup)
 
-#classa Healthbar, vytvara health bar nad hracom a enemy
+
+# classa Healthbar, vytvara health bar nad hracom a enemy
 
 class Healthbar():
-    def __init__(self,x,y,w,h,maxhp):
+    def __init__(self, x, y, w, h, maxhp):
         self.x = x
         self.y = y
         self.w = w
@@ -129,25 +167,26 @@ class Healthbar():
 
     # vykreslenie healthbaru
 
-    def draw (self, surface,hp):
+    def draw(self, surface, hp):
         ratio = hp / self.maxhp
-        pygame.draw.rect(surface,"red", (self.x,self.y,self.w,self.h))
-        pygame.draw.rect(surface,"white", (self.x, self.y, self.w*ratio, self.h))
+        pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
+        pygame.draw.rect(surface, "white", (self.x, self.y, self.w * ratio, self.h))
+
 
 # classa enemy, velmi podobna hracovi len sa neda hybat
 
-class Enemy (pygame.sprite.Sprite):
+class Enemy(pygame.sprite.Sprite):
 
     # zakladne nastavenie classy enemy
 
-    def __init__(self,x,y,enemyType):
+    def __init__(self, x, y, enemyType):
         super().__init__()
 
         # enemy premenne
         self.enemyType = enemyType
         self.Health = 100
         self.MaxHealth = 100
-        self.Healthbar = Healthbar(1500,250,250,25, self.MaxHealth)
+        self.Healthbar = Healthbar(1500, 250, 250, 25, self.MaxHealth)
         self.enemyPositionX = x
         self.enemyPositionY = y
 
@@ -157,10 +196,11 @@ class Enemy (pygame.sprite.Sprite):
         if enemyType == 1:
             for i in range(2):
                 self.sprites.append(pygame.image.load(f"sprites\\goblin\\goblin_idle_anim_f{i}.png").convert_alpha())
+            self.enemyAttack = 5
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]
 
-         # transformovanie spritu
+        # transformovanie spritu
 
         self.imageWIDTH = self.image.get_rect().width
         self.imageHEIGTH = self.image.get_rect().height
@@ -168,7 +208,7 @@ class Enemy (pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.Rect = self.image.get_rect()
-        self.Rect.topleft = (1500,300)
+        self.Rect.topleft = (1500, 300)
         self.rect.center = [self.enemyPositionX, self.enemyPositionY]
 
     # update funkcia, (zabudovana v Sprite classe), stara sa o animacie
@@ -188,18 +228,19 @@ class Enemy (pygame.sprite.Sprite):
         if self.current_sprite >= len(self.sprites):
             self.current_sprite = 0
         self.image = self.sprites[int(self.current_sprite)]
-        
+
         self.ImageWIDTH = self.image.get_rect().width
         self.ImageHEIGTH = self.image.get_rect().height
-        self.image = pygame.transform.scale(self.image, (self.ImageWIDTH *12, self.ImageHEIGTH * 12))
-        self.filpimage = pygame.transform.flip(self.image,True, False)
+        self.image = pygame.transform.scale(self.image, (self.ImageWIDTH * 12, self.ImageHEIGTH * 12))
+        self.filpimage = pygame.transform.flip(self.image, True, False)
         mainscreen.blit(self.filpimage, (self.Rect.x, self.Rect.y))
+
 
 class Player(pygame.sprite.Sprite):
 
     # init metoda
 
-    def __init__(self,obstacles):
+    def __init__(self, obstacles):
         super().__init__()
 
         # player premenne
@@ -207,7 +248,8 @@ class Player(pygame.sprite.Sprite):
         self.PLAYER_SPEED = 6
         self.Health = 100
         self.MaxHealth = 100
-        self.Healthbar = Healthbar(300,215,250,25, self.MaxHealth)
+        self.Healthbar = Healthbar(300, 215, 250, 25, self.MaxHealth)
+        self.Ressistance = 0
         self.timer = 0
         self.playerPositionX = 960
         self.playerPositionY = 540
@@ -244,7 +286,7 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2()
 
         self.idleRect = self.idleImage.get_rect()
-        self.idleRect.topleft = (300,100)
+        self.idleRect.topleft = (300, 100)
 
     # metoda na spustenie animacie
 
@@ -287,8 +329,8 @@ class Player(pygame.sprite.Sprite):
 
     # metoda collision, kontroluje
 
-    def collision(self,direction):
-        collision_sprites = pygame.sprite.spritecollide(self,self.obstacles,False)
+    def collision(self, direction):
+        collision_sprites = pygame.sprite.spritecollide(self, self.obstacles, False)
         if collision_sprites:
 
             # kontrola horizontalnych kolizii
@@ -344,7 +386,7 @@ class Player(pygame.sprite.Sprite):
             self.imageWIDTH = self.image.get_rect().width
             self.imageHEIGTH = self.image.get_rect().height
             self.image = pygame.transform.scale(self.image, (self.imageWIDTH * 3, self.imageHEIGTH * 3))
-            #self.rect.center = [self.pos.x, self.pos.y]
+            # self.rect.center = [self.pos.x, self.pos.y]
             self.rect.x = self.pos.x
             self.rect.y = self.pos.y
 
@@ -355,7 +397,7 @@ class Player(pygame.sprite.Sprite):
         if self.current_idleSprite >= len(self.idlesprites):
             self.current_idleSprite = 0
         self.idleImage = self.idlesprites[int(self.current_idleSprite)]
-        
+
         self.idleImageWIDTH = self.image.get_rect().width
         self.idleImageHEIGTH = self.image.get_rect().height
         self.idleImage = pygame.transform.scale(self.idleImage, (self.idleImageWIDTH * 6, self.idleImageHEIGTH * 6))
@@ -364,29 +406,28 @@ class Player(pygame.sprite.Sprite):
     # metoda drawtimer, vykresluje casovac vo fighte
 
     def drawtimer(self):
-        timerS = self.timer/1000
-    
+        timerS = self.timer / 1000
+
         ratio = min(timerS / TIMERMAXTIME, 1)
-        
 
-        pygame.draw.rect(mainscreen,"black", (1600,745,300,75))
-        pygame.draw.rect(mainscreen,"white", (1600,745,300*ratio,75))
+        pygame.draw.rect(mainscreen, "black", (1600, 745, 300, 75))
+        pygame.draw.rect(mainscreen, "white", (1600, 745, 300 * ratio, 75))
 
 
-#classa Button, vyrvtvara tlacitka
+# classa Button, vyrvtvara tlacitka
 
 class Button():
 
     # metoda __init__ (nacitava parametre, umiestnuje text na spravnu poziciu)
 
-    def __init__(self,x,y,text,fontsize):
+    def __init__(self, x, y, text, fontsize):
         super().__init__()
         self.fontsize = fontsize
         self.font = pygame.font.Font('Font\\rainyhearts.ttf', self.fontsize)
         self.text = text
-        self.button = self.font.render(self.text,True,(255,255,255))
+        self.button = self.font.render(self.text, True, (255, 255, 255))
         self.rect = self.button.get_rect()
-        self.rect.topleft = (x,y)
+        self.rect.topleft = (x, y)
         self.clicked = False
 
     # metoda draw (vykresluje, kontroluje stlacenie, a returnuje akciu)
@@ -404,13 +445,16 @@ class Button():
             self.clicked = False
         return action
 
+
 # Vytvorenie objektov z classy Button(), n# astavenie parametrov (x, y, text tlacitka, velkost fontu)
 
-attackButton = Button(100,725,"ATTACK",125)
-defendButton = Button(100,900,"DEFEND",125)
-magicButton = Button(700,725,"MAGIC",125)
-itemButton = Button(740,900,"ITEM",125)
-timerText = Button(1200,725,"TIMER :",125)
+attackButton = Button(100, 725, "ATTACK", 125)
+fireballButton = Button(100, 725, "FIREBALL", 125)
+frostfangButton = Button(100, 900, "FROSTFANG", 125)
+defendButton = Button(100, 900, "DEFEND", 125)
+magicButton = Button(700, 725, "MAGIC", 125)
+itemButton = Button(740, 900, "ITEM", 125)
+timerText = Button(1200, 725, "TIMER :", 125)
 # pridanie spritu do sprite groupu
 
 moving_sprites = pygame.sprite.GroupSingle()
@@ -418,12 +462,12 @@ player = Player(wallGroup)
 moving_sprites.add(player)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = Enemy(960,950,1)
+goblin = Enemy(960, 950, 1)
 enemy_sprites.add(goblin)
 
 # Vytvorenie objektov z classy Healthbar(), nastavenie parametrov (x, y, sirka, vyska,maxhp)
 
-playerHealthBar = Healthbar(325,175,250,25, player.MaxHealth)
+playerHealthBar = Healthbar(325, 175, 250, 25, player.MaxHealth)
 
 # main loop
 
@@ -439,7 +483,7 @@ while running:
 
     # enemy trigger
 
-    if pygame.sprite.spritecollide(player,enemy_sprites,True):
+    if pygame.sprite.spritecollide(player, enemy_sprites, True):
         mainG = False
 
     # vykreslovanie
@@ -448,4 +492,3 @@ while running:
         renderMainG()
     else:
         renderfight()
-
