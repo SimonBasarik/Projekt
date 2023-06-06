@@ -12,7 +12,7 @@ level1 = load_pygame("levely\\level1.tmx")
 
 # maximalny cas timeru
 
-TIMERMAXTIME = 5
+TIMERMAXTIME = 1
 
 
 pygame.mouse.set_visible(False)
@@ -438,7 +438,7 @@ while running:
             running = False
 
     # enemy trigger
- 
+
     if pygame.sprite.spritecollide(player,enemy_sprites,True):
         mainG = False
 
@@ -448,3 +448,4 @@ while running:
         renderMainG()
     else:
         renderfight()
+
