@@ -53,13 +53,19 @@ def renderfight():
 
     # vykreslenie hraca a animacia
     def enemyTurn():
-        enemyAttack = 5
-        enemyAttack -= player.Ressistance
-        player.Health -= enemyAttack
-
+        if goblin.type == 1:
+            goblin.enemyAttack -= player.Ressistance
+            player.Health -= goblin.enemyAttack
+        if demon.type == 2:
+            demon.enemyAttack -= player.Ressistance
+            player.Health -= demon.enemyAttack
 
     player.updateIdle()
-    goblin.updateIdle()
+    if goblin.enemyType == 1:
+        goblin.updateIdle()
+    if demon.enemyType == 2:
+        demon.updateIdle()
+
 
     # volanie funkcii tlacidiel
     if draw_mainButtons:
@@ -179,24 +185,30 @@ class Enemy(pygame.sprite.Sprite):
 
     # zakladne nastavenie classy enemy
 
-    def __init__(self, x, y, enemyType):
+    def __init__(self, x, y, enemyType, enemyAttack):
         super().__init__()
 
         # enemy premenne
         self.enemyType = enemyType
+        self.enemyAttack = enemyAttack
         self.Health = 100
         self.MaxHealth = 100
         self.Healthbar = Healthbar(1500, 250, 250, 25, self.MaxHealth)
         self.enemyPositionX = x
         self.enemyPositionY = y
 
+
         # player sprite nacitanie do listu
 
         self.sprites = []
         if enemyType == 1:
+            self.type = 0
             for i in range(2):
                 self.sprites.append(pygame.image.load(f"sprites\\goblin\\goblin_idle_anim_f{i}.png").convert_alpha())
-            self.enemyAttack = 5
+        if enemyType == 2:
+            self.type = 0
+            for i in range(2):
+                self.sprites.append(pygame.image.load(f"sprites\\demon\\big_demon_idle_anim_f{i}.png").convert_alpha())
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]
 
@@ -462,8 +474,10 @@ player = Player(wallGroup)
 moving_sprites.add(player)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = Enemy(960, 950, 1)
-enemy_sprites.add(goblin)
+goblin = Enemy(960, 950, 1, 5)
+demon = Enemy(760,750, 2, 15)
+enemy_sprites.add(goblin, demon)
+
 
 # Vytvorenie objektov z classy Healthbar(), nastavenie parametrov (x, y, sirka, vyska,maxhp)
 
