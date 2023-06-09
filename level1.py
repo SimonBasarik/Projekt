@@ -9,10 +9,12 @@ res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
 level1 = load_pygame("levely\\level1.tmx")
+gej2 = None
+enemy = None
 
 # maximalny cas timeru
 
-TIMERMAXTIME = 5
+TIMERMAXTIME = 1
 
 pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
@@ -24,13 +26,15 @@ clock = pygame.time.Clock()
 
 def renderMainG():
     # vykreslenie hraca a animacia
+    global gej2
+    global enemy
 
     moving_sprites.draw(mainscreen)
     moving_sprites.update()
 
-    if goblin.Health > 0:
-        enemy_sprites.draw(mainscreen)
-        enemy_sprites.update()
+    #if enemy:
+    enemy_sprites.draw(mainscreen)
+    enemy_sprites.update()
 
     pygame.display.flip()
     clock.tick(60)
@@ -40,11 +44,15 @@ def renderMainG():
 draw_mainButtons = True
 draw_magicButtons = False
 draw_itemButtons = False
+
 def renderfight():
     global draw_mainButtons
     global draw_magicButtons
     global draw_itemButtons
     global mainG
+    global gej2
+    global enemy
+
     mouse = pygame.mouse.get_pos()
     mainscreen.fill((28, 28, 28))
     time = clock.tick(60)
@@ -53,25 +61,30 @@ def renderfight():
 
     # vykreslenie hraca a animacia
     def enemyTurn():
-        if goblin.type == 1:
-            goblin.enemyAttack -= player.Ressistance
-            player.Health -= goblin.enemyAttack
-        if demon.type == 2:
-            demon.enemyAttack -= player.Ressistance
-            player.Health -= demon.enemyAttack
+
+        enemy.enemyAttack -= player.Ressistance
+        player.Health -= enemy.enemyAttack
+        enemy.enemyAttack += player.Ressistance
+        player.Ressistance = 0
+
 
     player.updateIdle()
-    if goblin.enemyType == 1:
-        goblin.updateIdle()
-    if demon.enemyType == 2:
-        demon.updateIdle()
+    if gej2 == goblin.image:
+        enemy = goblin
+    if gej2 == demon.image:
+        enemy = demon
 
+    if not enemy:
+        mainG = True
+        return
+
+    enemy.updateIdle()
 
     # volanie funkcii tlacidiel
     if draw_mainButtons:
         if attackButton.draw():
             if timerS >= TIMERMAXTIME:
-                goblin.Health -= 10
+                enemy.Health -= 10
                 player.timer = 0
                 enemyTurn()
         if defendButton.draw():
@@ -90,14 +103,14 @@ def renderfight():
     if draw_magicButtons == True:
         if fireballButton.draw():
             if timerS >= TIMERMAXTIME:
-                goblin.Health -= 20
+                enemy.Health -= 20
                 player.timer = 0
                 enemyTurn()
                 draw_magicButtons = False
                 draw_mainButtons = True
         if frostfangButton.draw():
             if timerS >= TIMERMAXTIME:
-                goblin.Health -= 20
+                enemy.Health -= 20
                 player.timer = 0
                 enemyTurn()
                 draw_magicButtons = False
@@ -106,16 +119,22 @@ def renderfight():
         pass
 
     # vykreslenie HealthBaru
-    goblin.Healthbar.draw(mainscreen, goblin.Health)
+    enemy.Healthbar.draw(mainscreen, enemy.Health)
     player.Healthbar.draw(mainscreen, player.Health)
     player.drawtimer()
     mainscreen.blit(cursor, mouse)
     if player.Health <= 0:
         mainG = True
         player.Health = 20
+        enemy.Health = 100
+        player.pos.y -= 20
 
-    if goblin.Health <= 0:
+    if enemy.Health <= 0:
         mainG = True
+        enemy = None
+        for i in enemy_sprites:
+            enemy_sprites.remove(i)
+
     pygame.display.flip()
 
 
@@ -185,12 +204,14 @@ class Enemy(pygame.sprite.Sprite):
 
     # zakladne nastavenie classy enemy
 
-    def __init__(self, x, y, enemyType, enemyAttack):
+    def __init__(self, x, y, enemyType, enemyAttack,idlex,idley):
         super().__init__()
 
         # enemy premenne
         self.enemyType = enemyType
         self.enemyAttack = enemyAttack
+        self.idlex = idlex
+        self.idley = idley
         self.Health = 100
         self.MaxHealth = 100
         self.Healthbar = Healthbar(1500, 250, 250, 25, self.MaxHealth)
@@ -202,11 +223,9 @@ class Enemy(pygame.sprite.Sprite):
 
         self.sprites = []
         if enemyType == 1:
-            self.type = 0
             for i in range(2):
                 self.sprites.append(pygame.image.load(f"sprites\\goblin\\goblin_idle_anim_f{i}.png").convert_alpha())
         if enemyType == 2:
-            self.type = 0
             for i in range(2):
                 self.sprites.append(pygame.image.load(f"sprites\\demon\\big_demon_idle_anim_f{i}.png").convert_alpha())
         self.current_sprite = 0
@@ -220,7 +239,7 @@ class Enemy(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.Rect = self.image.get_rect()
-        self.Rect.topleft = (1500, 300)
+        self.Rect.topleft = (self.idlex,self.idley)
         self.rect.center = [self.enemyPositionX, self.enemyPositionY]
 
     # update funkcia, (zabudovana v Sprite classe), stara sa o animacie
@@ -474,8 +493,8 @@ player = Player(wallGroup)
 moving_sprites.add(player)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = Enemy(960, 950, 1, 5)
-demon = Enemy(760,750, 2, 15)
+goblin = Enemy(960, 950, 1, 5, 1500,300)
+demon = Enemy(760,750, 2, 15, 1400,200)
 enemy_sprites.add(goblin, demon)
 
 
@@ -496,9 +515,17 @@ while running:
             running = False
 
     # enemy trigger
+    #gey = pygame.sprite.spritecollide(player, enemy_sprites, True)
+    for i in enemy_sprites:
+        penis = pygame.sprite.collide_mask(player, i)
+        if penis:
+            gej2 = i.image
+            mainG = False
 
-    if pygame.sprite.spritecollide(player, enemy_sprites, True):
-        mainG = False
+
+    #if gey:
+    #    print(enemy_sprites)
+    #    mainG = False
 
     # vykreslovanie
 
