@@ -45,6 +45,7 @@ def renderfight():
     global draw_magicButtons
     global draw_itemButtons
     global mainG
+
     mouse = pygame.mouse.get_pos()
     mainscreen.fill((28, 28, 28))
     time = clock.tick(60)
@@ -164,7 +165,7 @@ for layer in level1.visible_layers:
 # classa Healthbar, vytvara health bar nad hracom a enemy
 
 class Healthbar():
-    def __init__(self, x, y, w, h, maxhp):
+    def __init__(self, x, y, w, h, maxhp,):
         self.x = x
         self.y = y
         self.w = w
