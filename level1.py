@@ -1,4 +1,5 @@
 import pygame
+import random
 from pytmx.util_pygame import load_pygame
 
 pygame.init()
@@ -50,6 +51,7 @@ def renderfight():
     global draw_magicButtons
     global draw_itemButtons
     global mainG
+    global gej1
     global gej2
     global enemy
 
@@ -61,11 +63,11 @@ def renderfight():
 
     # vykreslenie hraca a animacia
     def enemyTurn():
-
         enemy.enemyAttack -= player.Ressistance
         player.Health -= enemy.enemyAttack
         enemy.enemyAttack += player.Ressistance
         player.Ressistance = 0
+
 
 
     player.updateIdle()
@@ -73,6 +75,12 @@ def renderfight():
         enemy = goblin
     if gej2 == demon.image:
         enemy = demon
+    if gej2 == muddy.image:
+        enemy = muddy
+    if gej2 == chort.image:
+        enemy = chort
+    if gej2 == bigzombie.image:
+        enemy = bigzombie
 
     if not enemy:
         mainG = True
@@ -123,17 +131,19 @@ def renderfight():
     player.Healthbar.draw(mainscreen, player.Health)
     player.drawtimer()
     mainscreen.blit(cursor, mouse)
+    #smrt hraca
     if player.Health <= 0:
         mainG = True
-        player.Health = 20
+        player.Health = 100
         enemy.Health = 100
         player.pos.y -= 20
-
+    #smrt nepriatela
     if enemy.Health <= 0:
         mainG = True
         enemy = None
+        player.playerPositionY += 100
         for i in enemy_sprites:
-            enemy_sprites.remove(i)
+            enemy_sprites.remove(gej1)
 
     pygame.display.flip()
 
@@ -218,16 +228,27 @@ class Enemy(pygame.sprite.Sprite):
         self.enemyPositionX = x
         self.enemyPositionY = y
 
+        self.randomAnimSpeed = random.randint(12, 21) / 100
+
 
         # player sprite nacitanie do listu
 
         self.sprites = []
         if enemyType == 1:
-            for i in range(2):
+            for i in range(4):
                 self.sprites.append(pygame.image.load(f"sprites\\goblin\\goblin_idle_anim_f{i}.png").convert_alpha())
         if enemyType == 2:
-            for i in range(2):
+            for i in range(4):
                 self.sprites.append(pygame.image.load(f"sprites\\demon\\big_demon_idle_anim_f{i}.png").convert_alpha())
+        if enemyType == 3:
+            for i in range(4):
+                self.sprites.append(pygame.image.load(f"sprites\\bigzombie\\big_zombie_idle_anim_f{i}.png").convert_alpha())
+        if enemyType == 4:
+            for i in range(4):
+                self.sprites.append(pygame.image.load(f"sprites\\chort\\chort_idle_anim_f{i}.png").convert_alpha())
+        if enemyType == 5:
+            for i in range(4):
+                self.sprites.append(pygame.image.load(f"sprites\\muddy\\muddy_anim_f{i}.png").convert_alpha())
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]
 
@@ -245,7 +266,7 @@ class Enemy(pygame.sprite.Sprite):
     # update funkcia, (zabudovana v Sprite classe), stara sa o animacie
 
     def update(self):
-        self.current_sprite += 0.025
+        self.current_sprite += self.randomAnimSpeed
         if self.current_sprite >= len(self.sprites):
             self.current_sprite = 0
         self.image = self.sprites[int(self.current_sprite)]
@@ -255,7 +276,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.center = [self.enemyPositionX, self.enemyPositionY]
 
     def updateIdle(self):
-        self.current_sprite += 0.025
+        self.current_sprite += self.randomAnimSpeed
         if self.current_sprite >= len(self.sprites):
             self.current_sprite = 0
         self.image = self.sprites[int(self.current_sprite)]
@@ -495,7 +516,10 @@ moving_sprites.add(player)
 enemy_sprites = pygame.sprite.Group()
 goblin = Enemy(960, 950, 1, 5, 1500,300)
 demon = Enemy(760,750, 2, 15, 1400,200)
-enemy_sprites.add(goblin, demon)
+bigzombie = Enemy(660,650,3,15,1400,200)
+muddy = Enemy(560,550,5,10,1500,300)
+chort = Enemy(960,750,4,5,1500,300)
+enemy_sprites.add(goblin, demon, bigzombie,muddy,chort)
 
 
 # Vytvorenie objektov z classy Healthbar(), nastavenie parametrov (x, y, sirka, vyska,maxhp)
@@ -519,9 +543,9 @@ while running:
     for i in enemy_sprites:
         penis = pygame.sprite.collide_mask(player, i)
         if penis:
+            gej1 = i
             gej2 = i.image
             mainG = False
-
 
     #if gey:
     #    print(enemy_sprites)
