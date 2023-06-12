@@ -1,9 +1,12 @@
-import pygame
+import pygame, json
 from pytmx.util_pygame import load_pygame
 
 pygame.init()
 
 # pociatocne nastavenie (premenne,konstanty,funkcie)
+
+# with open("saves.json") as f:
+#     data = json.load(f)
 
 res = (1920, 1080)  # rozlisenie
 
@@ -21,8 +24,28 @@ cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 
 clock = pygame.time.Clock()
 
+# funkcia renderMenu(, vykresluje menu
 
-# funkcia renderMainG(), vykresluje a riesi
+def renderMenu():
+    global mainG
+    global menu
+    global running
+
+    mouse = pygame.mouse.get_pos()
+
+    mainscreen.fill((0, 0, 0))
+
+
+    if startButton.draw():
+        mainG = True
+        menu = False
+
+    if quitButton.draw():
+        running = False
+
+    mainscreen.blit(cursor, mouse)
+    pygame.display.flip()
+# funkcia renderMainG(), vykresluje hraca a enemy
 
 def renderMainG():
     # vykreslenie hraca a animacia
@@ -477,8 +500,10 @@ class Button():
         return action
 
 
-# Vytvorenie objektov z classy Button(), n# astavenie parametrov (x, y, text tlacitka, velkost fontu)
+# Vytvorenie objektov z classy Button(), nastavenie parametrov (x, y, text tlacitka, velkost fontu)
 
+startButton = Button(775,400,"START", 125)
+quitButton = Button(815,600,"QUIT",125)
 attackButton = Button(100, 725, "ATTACK", 125)
 fireballButton = Button(100, 725, "FIREBALL", 125)
 frostfangButton = Button(100, 900, "FROSTFANG", 125)
@@ -505,7 +530,8 @@ playerHealthBar = Healthbar(325, 175, 250, 25, player.MaxHealth)
 # main loop
 
 running = True
-mainG = True
+menu = True
+mainG = False
 while running:
     mainscreen.fill((0, 0, 0))
     floorGroup.draw(mainscreen)
@@ -522,14 +548,15 @@ while running:
             gej2 = i.image
             mainG = False
 
+    pressed = pygame.key.get_pressed()
+    if pressed[pygame.K_ESCAPE]:
+        menu = True
 
-    #if gey:
-    #    print(enemy_sprites)
-    #    mainG = False
+    if menu:
+        renderMenu()
 
-    # vykreslovanie
-
-    if mainG:
+    elif mainG:
         renderMainG()
+
     else:
         renderfight()
