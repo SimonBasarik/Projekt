@@ -133,14 +133,16 @@ def renderfight():
     if draw_magicButtons == True:
         if fireballButton.draw(mainscreen):
             if timerS >= hrac.TIMERMAXTIME:
-                eenemy.Health -= 20
+                damage = 20 - eenemy.enemyFireResistance
+                eenemy.Health -= damage
                 player.timer = 0
                 enemyTurn()
                 draw_magicButtons = False
                 draw_mainButtons = True
         if frostfangButton.draw(mainscreen):
             if timerS >= hrac.TIMERMAXTIME:
-                eenemy.Health -= 20
+                damage = 20 - eenemy.enemyIceResistance
+                eenemy.Health -= damage
                 player.timer = 0
                 enemyTurn()
                 draw_magicButtons = False
@@ -235,12 +237,13 @@ player = hrac.Player(wallGroup)
 moving_sprites.add(player)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = enemy.Enemy(960, 950, 1, 5, 1500, 300)
-demon = enemy.Enemy(760, 750, 2, 15, 1400, 200)
-bigzombie = enemy.Enemy(660, 650, 3, 15, 1400, 200)
-muddy = enemy.Enemy(560, 550, 5, 10, 1500, 300)
-chort = enemy.Enemy(960, 750, 4, 5, 1500, 300)
-enemy_sprites.add(goblin, demon, bigzombie,muddy,chort)
+goblin = enemy.Enemy(960, 950, 1, 5, 1500, 300,0,0)
+demon = enemy.Enemy(760, 750, 2, 15, 1400, 200,15,-5)
+bigzombie = enemy.Enemy(660, 650, 3, 15, 1400, 200,5,5)
+muddy = enemy.Enemy(560, 550, 5, 10, 1500, 300,5,0)
+chort = enemy.Enemy(960, 750, 4, 5, 1500, 300,5,-5)
+
+
 
 # Vytvorenie objektov z classy Healthbar(), nastavenie parametrov (x, y, sirka, vyska,maxhp)
 
