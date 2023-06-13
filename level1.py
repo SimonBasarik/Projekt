@@ -242,7 +242,7 @@ demon = enemy.Enemy(760, 750, 2, 15, 1400, 200,15,-5)
 bigzombie = enemy.Enemy(660, 650, 3, 15, 1400, 200,5,5)
 muddy = enemy.Enemy(560, 550, 5, 10, 1500, 300,5,0)
 chort = enemy.Enemy(960, 750, 4, 5, 1500, 300,5,-5)
-
+enemy_sprites.add(goblin, demon, bigzombie,muddy,chort)
 
 
 # Vytvorenie objektov z classy Healthbar(), nastavenie parametrov (x, y, sirka, vyska,maxhp)

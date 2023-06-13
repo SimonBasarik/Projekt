@@ -6,10 +6,12 @@ class Enemy(pygame.sprite.Sprite):
 
     # zakladne nastavenie classy enemy
 
-    def __init__(self, x, y, enemyType, enemyAttack,idlex,idley):
+    def __init__(self, x, y, enemyType, enemyAttack,idlex,idley,enemyFireResistance,enemyIceResistance):
         super().__init__()
 
         # enemy premenne
+        self.enemyFireResistance = enemyFireResistance
+        self.enemyIceResistance = enemyIceResistance
         self.enemyType = enemyType
         self.enemyAttack = enemyAttack
         self.idlex = idlex
