@@ -70,6 +70,7 @@ def renderfight():
 
 
 
+
     player.updateIdle()
     if gej2 == goblin.image:
         enemy = goblin
