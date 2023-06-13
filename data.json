@@ -1,0 +1,16 @@
+{
+   "saves": [
+      {
+         "health": 20,
+         "score": 2
+      },
+      {
+         "health": 80,
+         "score": 1
+      },
+      {
+         "health": 100,
+         "score": 0
+      }
+   ]
+}
