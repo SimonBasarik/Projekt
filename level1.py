@@ -111,14 +111,16 @@ def renderfight():
     if draw_magicButtons == True:
         if fireballButton.draw():
             if timerS >= TIMERMAXTIME:
-                enemy.Health -= 20
+                damage = 20 - enemy.enemyFireResistance
+                enemy.Health -= damage
                 player.timer = 0
                 enemyTurn()
                 draw_magicButtons = False
                 draw_mainButtons = True
         if frostfangButton.draw():
             if timerS >= TIMERMAXTIME:
-                enemy.Health -= 20
+                damage = 20 - enemy.enemyIceResistance
+                enemy.Health -= damage
                 player.timer = 0
                 enemyTurn()
                 draw_magicButtons = False
@@ -214,10 +216,12 @@ class Enemy(pygame.sprite.Sprite):
 
     # zakladne nastavenie classy enemy
 
-    def __init__(self, x, y, enemyType, enemyAttack,idlex,idley):
+    def __init__(self, x, y, enemyType, enemyAttack,idlex,idley,enemyFireResistance,enemyIceResistance):
         super().__init__()
 
         # enemy premenne
+        self.enemyFireResistance = enemyFireResistance
+        self.enemyIceResistance = enemyIceResistance
         self.enemyType = enemyType
         self.enemyAttack = enemyAttack
         self.idlex = idlex
@@ -514,11 +518,11 @@ player = Player(wallGroup)
 moving_sprites.add(player)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = Enemy(960, 950, 1, 5, 1500,300)
-demon = Enemy(760,750, 2, 15, 1400,200)
-bigzombie = Enemy(660,650,3,15,1400,200)
-muddy = Enemy(560,550,5,10,1500,300)
-chort = Enemy(960,750,4,5,1500,300)
+goblin = Enemy(960, 950, 1, 5, 1500,300, 0, 0)
+demon = Enemy(760,750, 2, 15, 1400,200, 15,-5)
+bigzombie = Enemy(660,650,3,15,1400,200,5,5)
+muddy = Enemy(560,550,5,10,1500,300,5,0)
+chort = Enemy(960,750,4,5,1500,300,5,-5)
 enemy_sprites.add(goblin, demon, bigzombie,muddy,chort)
 
 
