@@ -6,8 +6,6 @@ pygame.init()
 
 # pociatocne nastavenie (premenne,konstanty,funkcie)
 
-# with open("saves.json") as f:
-#     data = json.load(f)
 res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
@@ -39,6 +37,7 @@ def renderMenu():
         menu = False
 
     if quitButton.draw(mainscreen):
+        writedata()
         running = False
 
     mainscreen.blit(cursor, mouse)
@@ -47,7 +46,9 @@ def renderMenu():
 # funkcia renderMainG(), vykresluje hraca a enemy
 
 def renderMainG():
+
     # vykreslenie hraca a animacia
+
     global gej2
     global eenemy
 
@@ -168,6 +169,7 @@ def renderfight():
     #smrt nepriatela
 
     if eenemy.Health <= 0:
+        player.score += 1
         mainG = True
         eenemy = None
         player.playerPositionY += 100
@@ -249,6 +251,28 @@ enemy_sprites.add(goblin, demon, bigzombie,muddy,chort)
 
 playerHealthBar = healthbar.Healthbar(325, 175, 250, 25, player.MaxHealth)
 
+pipik = dict()
+
+with open("data.json", "r", encoding="UTF-8") as f:
+    pipik = json.load(f)
+
+saves = pipik["saves"]
+
+
+def writedata():
+    global saves
+
+    data = {"health": player.Health, "score": player.score}
+
+    saves.append(data)
+
+    new_data = {"saves": saves}
+
+    new_json = json.dumps(new_data, indent=3)
+
+    with open("data.json", "w", encoding="UTF-8") as f:
+        f.write(new_json)
+
 # main loop
 
 running = True
@@ -260,6 +284,7 @@ while running:
     wallGroup.draw(mainscreen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            writedata()
             running = False
 
     # enemy trigger

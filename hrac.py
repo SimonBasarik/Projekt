@@ -19,6 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.Healthbar = healthbar.Healthbar(300, 215, 250, 25, self.MaxHealth)
         self.Ressistance = 0
         self.timer = 0
+        self.score = 0
         self.playerPositionX = 960
         self.playerPositionY = 540
 
