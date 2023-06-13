@@ -1,6 +1,6 @@
 import pygame, json, random
 from pytmx.util_pygame import load_pygame
-import hrac, button, enemy, healthbar
+import hrac, button, enemy, healthbar, obchodnik
 
 pygame.init()
 
@@ -19,6 +19,15 @@ pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 
 clock = pygame.time.Clock()
+
+def renderShop():
+    global mainG
+    global shop
+
+    mouse = pygame.mouse.get_pos()
+
+    mainscreen.fill((0, 0, 0))
+
 
 # funkcia renderMenu(, vykresluje menu
 
@@ -58,6 +67,9 @@ def renderMainG():
     #if enemy:
     enemy_sprites.draw(mainscreen)
     enemy_sprites.update()
+
+    Bussinessman_sprites.draw(mainscreen)
+    Bussinessman_sprites.update()
 
     pygame.display.flip()
     clock.tick(60)
@@ -138,18 +150,25 @@ def renderfight():
                 eenemy.Health -= damage
                 player.timer = 0
                 enemyTurn()
-                draw_magicButtons = False
-                draw_mainButtons = True
         if frostfangButton.draw(mainscreen):
             if timerS >= hrac.TIMERMAXTIME:
                 damage = 20 - eenemy.enemyIceResistance
                 eenemy.Health -= damage
                 player.timer = 0
                 enemyTurn()
-                draw_magicButtons = False
-                draw_mainButtons = True
+        if backbutton.draw(mainscreen):
+            draw_magicButtons = False
+            draw_mainButtons = True
     if draw_itemButtons == True:
-        pass
+        if manapotion.draw(mainscreen):
+            pass
+        if healpotion.draw(mainscreen):
+            player.Health += 20
+        if backbutton.draw(mainscreen):
+            draw_itemButtons = False
+            draw_mainButtons = True
+            player.timer = 0
+            enemyTurn()
 
     # vykreslenie HealthBaru
     eenemy.Healthbar.draw(mainscreen, eenemy.Health)
@@ -231,6 +250,10 @@ defendButton = button.Button(100, 900, "DEFEND", 125)
 magicButton = button.Button(700, 725, "MAGIC", 125)
 itemButton = button.Button(740, 900, "ITEM", 125)
 timerText = button.Button(1200, 725, "TIMER :", 125)
+healpotion = button.Button(100, 725, "HEALPOTION", 125)
+manapotion = button.Button(100, 900, "MANAPOTION", 125)
+backbutton = button.Button(1200,900,"<- BACK",125)
+
 
 # pridanie spritu do sprite groupu
 
@@ -246,6 +269,9 @@ muddy = enemy.Enemy(560, 550, 5, 10, 1500, 300,5,0)
 chort = enemy.Enemy(960, 750, 4, 5, 1500, 300,5,-5)
 enemy_sprites.add(goblin, demon, bigzombie,muddy,chort)
 
+Bussinessman_sprites = pygame.sprite.Group()
+Bussinessman = obchodnik.Bussinessman(750,450)
+Bussinessman_sprites.add(Bussinessman)
 
 # Vytvorenie objektov z classy Healthbar(), nastavenie parametrov (x, y, sirka, vyska,maxhp)
 
@@ -278,6 +304,8 @@ def writedata():
 running = True
 menu = True
 mainG = False
+fight = False
+shop = False
 while running:
     mainscreen.fill((0, 0, 0))
     floorGroup.draw(mainscreen)
@@ -295,6 +323,15 @@ while running:
             gej1 = i
             gej2 = i.image
             mainG = False
+            fight = True
+
+    for i in Bussinessman_sprites:
+        trader = pygame.sprite.collide_mask(player, i)
+        if trader:
+            trader1 = i
+            trader2 = i.image
+            mainG = False
+            shop = True
 
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_ESCAPE]:
@@ -306,5 +343,8 @@ while running:
     elif mainG:
         renderMainG()
 
-    else:
+    elif fight:
         renderfight()
+
+    elif shop:
+        renderShop()
