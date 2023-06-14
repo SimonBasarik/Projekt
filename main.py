@@ -9,6 +9,7 @@ pygame.init()
 res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
+
 level1 = load_pygame("levely\\level1.tmx")
 gej2 = None
 eenemy = None
@@ -17,6 +18,11 @@ eenemy = None
 
 pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
+fight_img = pygame.image.load("png\\fight.png").convert_alpha()
+fight_height = fight_img.get_rect().height
+fight_width = fight_img.get_rect().width
+fight_img = pygame.transform.scale(fight_img,(fight_width*3,fight_height*3))
+shop_img = pygame.image.load("png\\SHOP.png").convert_alpha()
 
 clock = pygame.time.Clock()
 
@@ -41,6 +47,8 @@ def renderMenu():
     mainscreen.fill((0, 0, 0))
 
 
+
+
     if startButton.draw(mainscreen):
         mainG = True
         menu = False
@@ -50,6 +58,7 @@ def renderMenu():
         running = False
 
     mainscreen.blit(cursor, mouse)
+
     pygame.display.flip()
 
 # funkcia renderMainG(), vykresluje hraca a enemy
@@ -94,6 +103,7 @@ def renderfight():
     time = clock.tick(60)
     player.timer += time
     timerS = player.timer / 1000
+    mainscreen.blit(fight_img, (0, 0))
 
     # vykreslenie hraca a animacia
     def enemyTurn():
@@ -194,6 +204,8 @@ def renderfight():
         player.playerPositionY += 100
         enemy_sprites.remove(gej1)
 
+
+
     pygame.display.flip()
 
 
@@ -243,16 +255,16 @@ for layer in level1.visible_layers:
 
 startButton = button.Button(775,400,"START", 125)
 quitButton = button.Button(815,600,"QUIT",125)
-attackButton = button.Button(100, 725, "ATTACK", 125)
-fireballButton = button.Button(100, 725, "FIREBALL", 125)
-frostfangButton = button.Button(100, 900, "FROSTFANG", 125)
-defendButton = button.Button(100, 900, "DEFEND", 125)
-magicButton = button.Button(700, 725, "MAGIC", 125)
-itemButton = button.Button(740, 900, "ITEM", 125)
-timerText = button.Button(1200, 725, "TIMER :", 125)
-healpotion = button.Button(100, 725, "HEALPOTION", 125)
-manapotion = button.Button(100, 900, "MANAPOTION", 125)
-backbutton = button.Button(1200,900,"<- BACK",125)
+attackButton = button.Button(150, 700, "ATTACK", 125)
+fireballButton = button.Button(150, 700, "FIREBALL", 125)
+frostfangButton = button.Button(150, 850, "FROSTFANG", 125)
+defendButton = button.Button(150, 850, "DEFEND", 125)
+magicButton = button.Button(700, 700, "MAGIC", 125)
+itemButton = button.Button(700, 850, "ITEM", 125)
+timerText = button.Button(1250, 700, "TIMER :", 90)
+healpotion = button.Button(150, 700, "HEALPOTION", 125)
+manapotion = button.Button(150, 850, "MANAPOTION", 125)
+backbutton = button.Button(1300,850,"<- BACK",90)
 
 
 # pridanie spritu do sprite groupu
