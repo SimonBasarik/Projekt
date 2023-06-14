@@ -20,6 +20,8 @@ class Player(pygame.sprite.Sprite):
         self.Ressistance = 0
         self.timer = 0
         self.score = 0
+        self.gamelevel = 1
+        self.playerlevel = 1
         self.playerPositionX = 960
         self.playerPositionY = 540
 

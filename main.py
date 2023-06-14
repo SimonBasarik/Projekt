@@ -10,6 +10,8 @@ res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
 level1 = load_pygame("levely\\level1.tmx")
+level2 = load_pygame("levely\\level2.tmx")
+
 gej2 = None
 eenemy = None
 
@@ -21,7 +23,7 @@ cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
 clock = pygame.time.Clock()
 
 def renderShop():
-    global mainG
+    global gamelevel1
     global shop
 
     mouse = pygame.mouse.get_pos()
@@ -32,7 +34,7 @@ def renderShop():
 # funkcia renderMenu(, vykresluje menu
 
 def renderMenu():
-    global mainG
+    global gamelevel1
     global menu
     global running
 
@@ -42,7 +44,7 @@ def renderMenu():
 
 
     if startButton.draw(mainscreen):
-        mainG = True
+        gamelevel1 = True
         menu = False
 
     if quitButton.draw(mainscreen):
@@ -54,7 +56,36 @@ def renderMenu():
 
 # funkcia renderMainG(), vykresluje hraca a enemy
 
-def renderMainG():
+def renderLevel1():
+
+    # vykreslenie hraca a animacia
+
+    global gej2
+    global eenemy
+    global gamelevel2
+
+    moving_sprites.draw(mainscreen)
+    moving_sprites.update()
+
+    enemy_sprites.draw(mainscreen)
+    enemy_sprites.update()
+
+    pygame.display.flip()
+    clock.tick(60)
+
+    if player.pos.y > res[1]:
+        for wall in wallGroup:
+            wallGroup.remove(wall)
+        for floor in floorGroup:
+            floorGroup.remove(floor)
+        enemy_sprites.add(muddy)
+        player.gamelevel = 2
+        gamelevel2 = True
+        loadlevel2()
+        player.pos.y = 50
+
+def renderLevel2():
+
 
     # vykreslenie hraca a animacia
 
@@ -64,7 +95,6 @@ def renderMainG():
     moving_sprites.draw(mainscreen)
     moving_sprites.update()
 
-    #if enemy:
     enemy_sprites.draw(mainscreen)
     enemy_sprites.update()
 
@@ -73,7 +103,6 @@ def renderMainG():
 
     pygame.display.flip()
     clock.tick(60)
-
 
 # funkcia renderfight(), vykresluje a stara sa o hlavne vlastnosti suboja
 draw_mainButtons = True
@@ -84,7 +113,7 @@ def renderfight():
     global draw_mainButtons
     global draw_magicButtons
     global draw_itemButtons
-    global mainG
+    global gamelevel1
     global gej1
     global gej2
     global eenemy
@@ -117,7 +146,7 @@ def renderfight():
         eenemy = bigzombie
 
     if not eenemy:
-        mainG = True
+        gamelevel1 = True
         return
 
     eenemy.updateIdle(mainscreen)
@@ -179,7 +208,7 @@ def renderfight():
     # smrt hraca
 
     if player.Health <= 0:
-        mainG = True
+        gamelevel1 = True
         player.Health = 20
         eenemy.Health = 100
         player.pos.x = 960
@@ -189,10 +218,10 @@ def renderfight():
 
     if eenemy.Health <= 0:
         player.score += 1
-        mainG = True
+        gamelevel1 = True
         eenemy = None
         player.playerPositionY += 100
-        enemy_sprites.remove(gej1)
+        pygame.sprite.Sprite.kill(gej1)
 
     pygame.display.flip()
 
@@ -221,24 +250,6 @@ class Walls(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.old_rect = self.rect.copy()
 
-
-# pridanie stien a podlahy do ich vlastných groupov
-
-floorGroup = pygame.sprite.Group()
-wallGroup = pygame.sprite.Group()
-for layer in level1.visible_layers:
-    if layer.name == "ground":
-        for x, y, surf in layer.tiles():
-            pos = (x * 48, y * 48)
-            Floor(pos=pos, surf=surf, groups=floorGroup)
-
-for layer in level1.visible_layers:
-    if layer.name == "walls":
-        for x, y, surf in layer.tiles():
-            pos = (x * 48, y * 48)
-            Walls(pos=pos, surf=surf, groups=wallGroup)
-
-
 # Vytvorenie objektov z classy Button(), nastavenie parametrov (x, y, text tlacitka, velkost fontu)
 
 startButton = button.Button(775,400,"START", 125)
@@ -254,6 +265,10 @@ healpotion = button.Button(100, 725, "HEALPOTION", 125)
 manapotion = button.Button(100, 900, "MANAPOTION", 125)
 backbutton = button.Button(1200,900,"<- BACK",125)
 
+# Vytvorenie floor, a wall group, neskôr v kóde sa do nich pridajú jednotlivé tily
+
+floorGroup = pygame.sprite.Group()
+wallGroup = pygame.sprite.Group()
 
 # pridanie spritu do sprite groupu
 
@@ -261,16 +276,18 @@ moving_sprites = pygame.sprite.GroupSingle()
 player = hrac.Player(wallGroup)
 moving_sprites.add(player)
 
+# Vytvorenie enemies z classy Enemy(posx,posy,enemytype,sila utoku, x pozicia pri suboju, y pozicia pri suboju, fire resistance, ice resistance)
+
 enemy_sprites = pygame.sprite.Group()
 goblin = enemy.Enemy(960, 950, 1, 5, 1500, 300,0,0)
 demon = enemy.Enemy(760, 750, 2, 15, 1400, 200,15,-5)
 bigzombie = enemy.Enemy(660, 650, 3, 15, 1400, 200,5,5)
-muddy = enemy.Enemy(560, 550, 5, 10, 1500, 300,5,0)
+muddy = enemy.Enemy(560, 560, 5, 10, 1500, 300,5,0)
 chort = enemy.Enemy(960, 750, 4, 5, 1500, 300,5,-5)
-enemy_sprites.add(goblin, demon, bigzombie,muddy,chort)
+enemy_sprites.add(goblin)
 
 Bussinessman_sprites = pygame.sprite.Group()
-Bussinessman = obchodnik.Bussinessman(750,450)
+Bussinessman = obchodnik.Bussinessman(270,150)
 Bussinessman_sprites.add(Bussinessman)
 
 # Vytvorenie objektov z classy Healthbar(), nastavenie parametrov (x, y, sirka, vyska,maxhp)
@@ -284,11 +301,10 @@ with open("data.json", "r", encoding="UTF-8") as f:
 
 saves = pipik["saves"]
 
-
 def writedata():
     global saves
 
-    data = {"health": player.Health, "score": player.score}
+    data = {"health": player.Health, "score": player.score, "Game level": player.gamelevel}
 
     saves.append(data)
 
@@ -299,13 +315,47 @@ def writedata():
     with open("data.json", "w", encoding="UTF-8") as f:
         f.write(new_json)
 
+# pridanie stien a podlahy do ich vlastných groupov
+
+def loadlevel2():
+    for layer in level2.visible_layers:
+        if layer.name == "ground":
+            for x, y, surf in layer.tiles():
+                pos = (x * 48, y * 48)
+                Floor(pos=pos, surf=surf, groups=floorGroup)
+
+    for layer in level2.visible_layers:
+        if layer.name == "walls":
+            for x, y, surf in layer.tiles():
+                pos = (x * 48, y * 48)
+                Walls(pos=pos, surf=surf, groups=wallGroup)
+def checklevels():
+    if player.gamelevel == 1:
+        for layer in level1.visible_layers:
+            if layer.name == "ground":
+                for x, y, surf in layer.tiles():
+                    pos = (x * 48, y * 48)
+                    Floor(pos=pos, surf=surf, groups=floorGroup)
+
+        for layer in level1.visible_layers:
+            if layer.name == "walls":
+                for x, y, surf in layer.tiles():
+                    pos = (x * 48, y * 48)
+                    Walls(pos=pos, surf=surf, groups=wallGroup)
+    elif player.gamelevel == 2:
+        loadlevel2()
+
+
+
 # main loop
 
 running = True
 menu = True
-mainG = False
+gamelevel1 = False
+gamelevel2 = False
 fight = False
 shop = False
+checklevels()
 while running:
     mainscreen.fill((0, 0, 0))
     floorGroup.draw(mainscreen)
@@ -322,7 +372,7 @@ while running:
         if penis:
             gej1 = i
             gej2 = i.image
-            mainG = False
+            gamelevel1 = False
             fight = True
 
     for i in Bussinessman_sprites:
@@ -330,7 +380,7 @@ while running:
         if trader:
             trader1 = i
             trader2 = i.image
-            mainG = False
+            gamelevel1 = False
             shop = True
 
     pressed = pygame.key.get_pressed()
@@ -340,8 +390,11 @@ while running:
     if menu:
         renderMenu()
 
-    elif mainG:
-        renderMainG()
+    elif gamelevel1:
+        renderLevel1()
+
+    elif gamelevel2:
+        renderLevel2()
 
     elif fight:
         renderfight()

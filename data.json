@@ -1,16 +1,29 @@
 {
    "saves": [
       {
-         "health": 20,
-         "score": 2
+         "health": 75,
+         "score": 1,
+         "Game level": 2
       },
       {
-         "health": 80,
-         "score": 1
+         "health": 75,
+         "score": 1,
+         "Game level": 2
+      },
+      {
+         "health": 90,
+         "score": 0,
+         "Game level": 1
       },
       {
          "health": 100,
-         "score": 0
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 75,
+         "score": 1,
+         "Game level": 2
       }
    ]
 }
