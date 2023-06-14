@@ -30,9 +30,11 @@ shop_width = shop_img.get_rect().width
 shop_img = pygame.transform.scale(shop_img,(shop_width*3,shop_height*3))
 
 clock = pygame.time.Clock()
+
 sidebar = False
+
 def renderShop():
-    global gamelevel1
+    global gamelevel
     global shop
     global sidebar
     global trader1
@@ -50,8 +52,10 @@ def renderShop():
     if shopMANA.draw(mainscreen):
         sidebar = True
     if shopexit.draw(mainscreen):
-        mainG = True
+        gamelevel = player.gamelevel
         shop = False
+        sidebar = False
+        player.pos.y += 150
 
     if sidebar:
         buybutton.draw(mainscreen)
@@ -64,7 +68,7 @@ def renderShop():
 # funkcia renderMenu(, vykresluje menu
 
 def renderMenu():
-    global gamelevel1
+    global gamelevel
     global menu
     global running
 
@@ -76,7 +80,7 @@ def renderMenu():
 
 
     if startButton.draw(mainscreen):
-        gamelevel1 = True
+        gamelevel = player.gamelevel
         menu = False
 
     if quitButton.draw(mainscreen):
@@ -95,7 +99,7 @@ def renderLevel1():
 
     global gej2
     global eenemy
-    global gamelevel2
+    global gamelevel
 
     moving_sprites.draw(mainscreen)
     moving_sprites.update()
@@ -113,7 +117,7 @@ def renderLevel1():
             floorGroup.remove(floor)
         enemy_sprites.add(muddy)
         player.gamelevel = 2
-        gamelevel2 = True
+        gamelevel = player.gamelevel
         loadlevel2()
         player.pos.y = 50
 
@@ -146,10 +150,11 @@ def renderfight():
     global draw_mainButtons
     global draw_magicButtons
     global draw_itemButtons
-    global gamelevel1
+    global gamelevel
     global gej1
     global gej2
     global eenemy
+    global fight
 
     mouse = pygame.mouse.get_pos()
     mainscreen.fill((28, 28, 28))
@@ -166,7 +171,6 @@ def renderfight():
         player.Ressistance = 0
 
 
-
     player.updateIdle(mainscreen)
     if gej2 == goblin.image:
         eenemy = goblin
@@ -180,7 +184,7 @@ def renderfight():
         eenemy = bigzombie
 
     if not eenemy:
-        gamelevel1 = True
+        gamelevel = player.gamelevel
         return
 
     eenemy.updateIdle(mainscreen)
@@ -242,19 +246,20 @@ def renderfight():
     # smrt hraca
 
     if player.Health <= 0:
-        gamelevel1 = True
-        player.Health = 20
-        eenemy.Health = 100
         player.pos.x = 960
         player.pos.y = 540
+        gamelevel = player.gamelevel
+        fight = False
+        player.Health = 20
+        eenemy.Health = 100
 
     #smrt nepriatela
 
     if eenemy.Health <= 0:
         player.score += 1
-        gamelevel1 = True
+        gamelevel = player.gamelevel
+        fight = False
         eenemy = None
-        player.playerPositionY += 100
         pygame.sprite.Sprite.kill(gej1)
 
 
@@ -391,13 +396,11 @@ def checklevels():
 
 
 # main loop
-
+shop = False
 running = True
 menu = True
-gamelevel1 = False
-gamelevel2 = False
+gamelevel = 1
 fight = False
-shop = False
 checklevels()
 while running:
     mainscreen.fill((0, 0, 0))
@@ -407,6 +410,7 @@ while running:
         if event.type == pygame.QUIT:
             writedata()
             running = False
+    pygame.draw.rect(mainscreen,(255,0,0),player.rect,5,1)
 
     # enemy trigger
 
@@ -415,7 +419,6 @@ while running:
         if penis:
             gej1 = i
             gej2 = i.image
-            gamelevel1 = False
             fight = True
 
     for i in Bussinessman_sprites:
@@ -423,7 +426,6 @@ while running:
         if trader:
             trader1 = i
             trader2 = i.image
-            gamelevel1 = False
             shop = True
 
     pressed = pygame.key.get_pressed()
@@ -432,15 +434,17 @@ while running:
 
     if menu:
         renderMenu()
+    else:
 
-    elif gamelevel1:
-        renderLevel1()
+        if not fight and not shop:
+            if gamelevel == 1:
+                renderLevel1()
 
-    elif gamelevel2:
-        renderLevel2()
+            elif gamelevel == 2:
+                renderLevel2()
 
-    elif fight:
-        renderfight()
+        if fight:
+            renderfight()
 
-    elif shop:
-        renderShop()
+        if shop:
+            renderShop()
