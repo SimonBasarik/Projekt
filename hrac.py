@@ -181,6 +181,6 @@ class Player(pygame.sprite.Sprite):
 
         ratio = min(timerS / TIMERMAXTIME, 1)
 
-        pygame.draw.rect(mainscreen, "black", (1600, 745, 300, 75))
-        pygame.draw.rect(mainscreen, "white", (1600, 745, 300 * ratio, 75))
+        pygame.draw.rect(mainscreen, "black", (1550, 720, 250, 55))
+        pygame.draw.rect(mainscreen, "white", (1550, 720, 250 * ratio, 55))
 

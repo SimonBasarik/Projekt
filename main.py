@@ -9,6 +9,7 @@ pygame.init()
 res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
+
 level1 = load_pygame("levely\\level1.tmx")
 level2 = load_pygame("levely\\level2.tmx")
 
@@ -19,17 +20,46 @@ eenemy = None
 
 pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
+fight_img = pygame.image.load("png\\fight.png").convert_alpha()
+fight_height = fight_img.get_rect().height
+fight_width = fight_img.get_rect().width
+fight_img = pygame.transform.scale(fight_img,(fight_width*3,fight_height*3))
+shop_img = pygame.image.load("png\\SHOP.png").convert_alpha()
+shop_height = shop_img.get_rect().height
+shop_width = shop_img.get_rect().width
+shop_img = pygame.transform.scale(shop_img,(shop_width*3,shop_height*3))
 
 clock = pygame.time.Clock()
-
+sidebar = False
 def renderShop():
     global gamelevel1
     global shop
+    global sidebar
+    global trader1
+    global trader2
+
 
     mouse = pygame.mouse.get_pos()
-
     mainscreen.fill((0, 0, 0))
+    mainscreen.blit(shop_img,(0,0))
+    shopSHOP.draw(mainscreen)
 
+
+    if shopHEAL.draw(mainscreen):
+        sidebar = True
+    if shopMANA.draw(mainscreen):
+        sidebar = True
+    if shopexit.draw(mainscreen):
+        mainG = True
+        shop = False
+
+    if sidebar:
+        buybutton.draw(mainscreen)
+        sellbutton.draw(mainscreen)
+
+    mainscreen.blit(cursor, mouse)
+
+    pygame.display.flip()
 
 # funkcia renderMenu(, vykresluje menu
 
@@ -43,6 +73,8 @@ def renderMenu():
     mainscreen.fill((0, 0, 0))
 
 
+
+
     if startButton.draw(mainscreen):
         gamelevel1 = True
         menu = False
@@ -52,6 +84,7 @@ def renderMenu():
         running = False
 
     mainscreen.blit(cursor, mouse)
+
     pygame.display.flip()
 
 # funkcia renderMainG(), vykresluje hraca a enemy
@@ -123,6 +156,7 @@ def renderfight():
     time = clock.tick(60)
     player.timer += time
     timerS = player.timer / 1000
+    mainscreen.blit(fight_img, (0, 0))
 
     # vykreslenie hraca a animacia
     def enemyTurn():
@@ -223,6 +257,8 @@ def renderfight():
         player.playerPositionY += 100
         pygame.sprite.Sprite.kill(gej1)
 
+
+
     pygame.display.flip()
 
 
@@ -252,18 +288,25 @@ class Walls(pygame.sprite.Sprite):
 
 # Vytvorenie objektov z classy Button(), nastavenie parametrov (x, y, text tlacitka, velkost fontu)
 
-startButton = button.Button(775,400,"START", 125)
-quitButton = button.Button(815,600,"QUIT",125)
-attackButton = button.Button(100, 725, "ATTACK", 125)
-fireballButton = button.Button(100, 725, "FIREBALL", 125)
-frostfangButton = button.Button(100, 900, "FROSTFANG", 125)
-defendButton = button.Button(100, 900, "DEFEND", 125)
-magicButton = button.Button(700, 725, "MAGIC", 125)
-itemButton = button.Button(740, 900, "ITEM", 125)
-timerText = button.Button(1200, 725, "TIMER :", 125)
-healpotion = button.Button(100, 725, "HEALPOTION", 125)
-manapotion = button.Button(100, 900, "MANAPOTION", 125)
-backbutton = button.Button(1200,900,"<- BACK",125)
+startButton = button.Button(775,400,"START", 60)
+quitButton = button.Button(815,600,"QUIT",60)
+attackButton = button.Button(150, 720, "ATTACK", 60)
+fireballButton = button.Button(150, 720, "FIREBALL", 60)
+frostfangButton = button.Button(150, 870, "FROSTFANG", 60)
+defendButton = button.Button(150, 870, "DEFEND", 60)
+magicButton = button.Button(700, 720, "MAGIC", 60)
+itemButton = button.Button(700, 870, "ITEM", 60)
+timerText = button.Button(1250, 720, "TIMER:", 45)
+healpotion = button.Button(150, 720, "HEALPOTION", 60)
+manapotion = button.Button(150, 870, "MANAPOTION", 60)
+backbutton = button.Button(1300,870,"<- BACK",45)
+buybutton = button.Button(1300,850,"BUY",60)
+sellbutton = button.Button(1600,850,"SELL",60)
+shopexit = button.Button(100,850,"LEAVE", 50)
+shopSHOP = button.Button(770,150,"SHOP", 120)
+shopHEAL = button.Button(100,150,"HEALPOTION", 50)
+shopMANA = button.Button(100,250,"MANAPOTION", 50)
+shopSWORD = button.Button(300,850,"EXIT", 60)
 
 # Vytvorenie floor, a wall group, neskôr v kóde sa do nich pridajú jednotlivé tily
 
