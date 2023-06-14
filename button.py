@@ -9,7 +9,7 @@ class Button():
     def __init__(self, x, y, text, fontsize):
         super().__init__()
         self.fontsize = fontsize
-        self.font = pygame.font.Font('Font\\rainyhearts.ttf', self.fontsize)
+        self.font = pygame.font.Font('Font\\Wizard.ttf', self.fontsize)
         self.text = text
         self.button = self.font.render(self.text, True, (255, 255, 255))
         self.rect = self.button.get_rect()
