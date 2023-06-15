@@ -9,7 +9,8 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         # player premenne
-        self.TIMERMAXTIME = 1
+        self.attack = 10
+        self.TIMERMAXTIME = 3
         self.obstacles = obstacles
         self.PLAYER_SPEED = 6
         self.Health = 100

@@ -50,6 +50,9 @@ class Enemy(pygame.sprite.Sprite):
         if enemyType == 5:
             for i in range(4):
                 self.sprites.append(pygame.image.load(f"sprites\\muddy\\muddy_anim_f{i}.png").convert_alpha())
+        if enemyType == 6:
+            for i in range(4):
+                self.sprites.append(pygame.image.load(f"sprites\\skeleton\\skelet_idle_anim_f{i}.png").convert_alpha())
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]
 
