@@ -234,6 +234,8 @@ def renderfight():
             pass
         if healpotion.draw(mainscreen):
             player.Health += 20
+            if player.Health > player.MaxHealth:
+                player.Health = player.MaxHealth
         if backbutton.draw(mainscreen):
             draw_itemButtons = False
             draw_mainButtons = True

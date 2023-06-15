@@ -553,6 +553,11 @@
          "health": 25,
          "score": 2,
          "Game level": 2
+      },
+      {
+         "health": 95,
+         "score": 0,
+         "Game level": 1
       }
    ]
 }
