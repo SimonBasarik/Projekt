@@ -214,12 +214,12 @@ def renderfight():
 
     if draw_mainButtons:
         if attackButton.draw(mainscreen):
-            if timerS >= hrac.TIMERMAXTIME:
+            if timerS >= player.TIMERMAXTIME:
                 enemy.Health -= 10
                 player.timer = 0
 
         if defendButton.draw(mainscreen):
-            if timerS >= hrac.TIMERMAXTIME:
+            if timerS >= player.TIMERMAXTIME:
                 player.Ressistance = 4
                 player.timer = 0
 
@@ -236,14 +236,14 @@ def renderfight():
 
     if draw_magicButtons == True:
         if fireballButton.draw(mainscreen):
-            if timerS >= hrac.TIMERMAXTIME and player.Mana >= 5:
+            if timerS >= player.TIMERMAXTIME and player.Mana >= 5:
                 damage = 20 - enemy.enemyFireResistance
                 player.Mana -= 5
                 enemy.Health -= damage
                 player.timer = 0
 
         if frostfangButton.draw(mainscreen):
-            if timerS >= hrac.TIMERMAXTIME and player.Mana >= 5:
+            if timerS >= player.TIMERMAXTIME and player.Mana >= 5:
                 damage = 20 - enemy.enemyIceResistance
                 player.Mana -= 5
                 enemy.Health -= damage
@@ -258,11 +258,11 @@ def renderfight():
     if draw_itemButtons == True:
 
         if manapotion.draw(mainscreen):
-            if timerS >= hrac.TIMERMAXTIME:
+            if timerS >= player.TIMERMAXTIME:
                 player.Mana += 10
                 player.timer = 0
         if healpotion.draw(mainscreen):
-            if timerS >= hrac.TIMERMAXTIME:
+            if timerS >= player.TIMERMAXTIME:
                 player.Health += 20
                 player.timer = 0
                 if player.Health > player.MaxHealth:
@@ -283,7 +283,7 @@ def renderfight():
     # smrt hraca
 
     if player.Health <= 0:
-        player.pos.x = 960
+        player.pos.x =player
         player.pos.y = 540
         gamelevel = player.gamelevel
         fight = False
@@ -458,7 +458,6 @@ while running:
         if event.type == pygame.QUIT:
             writedata()
             running = False
-    pygame.draw.rect(mainscreen,(255,0,0),player.rect,5,1)
 
     # kontrola kolizii s nepriatelmi
 
