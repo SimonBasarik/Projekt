@@ -1,6 +1,4 @@
-import math
-
-import pygame, json, random
+import pygame, json,math
 from pytmx.util_pygame import load_pygame
 import hrac, button, enemy, healthbar, obchodnik
 
@@ -166,14 +164,6 @@ def renderfight():
     timerS = player.timer / 1000
     mainscreen.blit(fight_img, (0, 0))
 
-    # vykreslenie hraca a animacia
-    def enemyTurn():
-        eenemy.enemyAttack -= player.Ressistance
-        player.Health -= eenemy.enemyAttack
-        eenemy.enemyAttack += player.Ressistance
-        player.Ressistance = 0
-
-
     player.updateIdle(mainscreen)
     if gej2 == goblin.image:
         eenemy = goblin
@@ -187,10 +177,16 @@ def renderfight():
         eenemy = bigzombie
 
     if not eenemy:
-        gamelevel = player.gamelevel
+        gamelevel = player.gamelevels
         return
 
     eenemy.updateIdle(mainscreen)
+
+    if eenemy.enemyTimer():
+        eenemy.enemyAttack -= player.Ressistance
+        player.Health -= eenemy.enemyAttack
+        eenemy.enemyAttack += player.Ressistance
+        player.Ressistance = 0
 
     # volanie funkcii tlacidiel
 
@@ -199,11 +195,12 @@ def renderfight():
             if timerS >= hrac.TIMERMAXTIME:
                 eenemy.Health -= 10
                 player.timer = 0
-                enemyTurn()
+                # enemyTurn()
+
         if defendButton.draw(mainscreen):
             if timerS >= hrac.TIMERMAXTIME:
                 player.Ressistance = 4
-                enemyTurn()
+                # enemyTurn()
 
                 player.timer = 0
         if magicButton.draw(mainscreen):
@@ -219,13 +216,13 @@ def renderfight():
                 damage = 20 - eenemy.enemyFireResistance
                 eenemy.Health -= damage
                 player.timer = 0
-                enemyTurn()
+                # enemyTurn()
         if frostfangButton.draw(mainscreen):
             if timerS >= hrac.TIMERMAXTIME:
                 damage = 20 - eenemy.enemyIceResistance
                 eenemy.Health -= damage
                 player.timer = 0
-                enemyTurn()
+                # enemyTurn()
         if backbutton.draw(mainscreen):
             draw_magicButtons = False
             draw_mainButtons = True
@@ -240,7 +237,7 @@ def renderfight():
             draw_itemButtons = False
             draw_mainButtons = True
             player.timer = 0
-            enemyTurn()
+            # enemyTurn()
 
     # vykreslenie HealthBaru
     eenemy.Healthbar.draw(mainscreen, eenemy.Health)
@@ -332,11 +329,11 @@ moving_sprites.add(player)
 # Vytvorenie enemies z classy Enemy(posx,posy,enemytype,sila utoku, x pozicia pri suboju, y pozicia pri suboju, fire resistance, ice resistance)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = enemy.Enemy(960, 950, 1, 5, 1500, 300,0,0)
-demon = enemy.Enemy(760, 750, 2, 15, 1400, 200,15,-5)
-bigzombie = enemy.Enemy(660, 650, 3, 15, 1400, 200,5,5)
-muddy = enemy.Enemy(560, 560, 5, 10, 1500, 300,5,0)
-chort = enemy.Enemy(960, 750, 4, 5, 1500, 300,5,-5)
+goblin = enemy.Enemy(960, 950, 1, 5, 1500, 300,0,0,0.5)
+demon = enemy.Enemy(760, 750, 2, 15, 1400, 200,15,-5,0.5)
+bigzombie = enemy.Enemy(660, 650, 3, 15, 1400, 200,5,5,0.5)
+muddy = enemy.Enemy(560, 560, 5, 10, 1500, 300,5,0,0.5)
+chort = enemy.Enemy(960, 750, 4, 5, 1500, 300,5,-5,0.5)
 enemy_sprites.add(goblin)
 
 Bussinessman_sprites = pygame.sprite.Group()

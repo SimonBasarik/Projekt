@@ -1,21 +1,24 @@
 import pygame,random,healthbar
 
 # classa enemy, velmi podobna hracovi len sa neda hybat
-
 class Enemy(pygame.sprite.Sprite):
 
     # zakladne nastavenie classy enemy
 
-    def __init__(self, x, y, enemyType, enemyAttack ,idlex, idley, enemyFireResistance, enemyIceResistance):
+    def __init__(self, x, y, enemyType, enemyAttack ,idlex, idley, enemyFireResistance, enemyIceResistance, TIMERMAXTIME):
         super().__init__()
 
         # enemy premenne
+        self.TIMERMAXTIME = TIMERMAXTIME
         self.enemyFireResistance = enemyFireResistance
         self.enemyIceResistance = enemyIceResistance
         self.enemyType = enemyType
         self.enemyAttack = enemyAttack
         self.idlex = idlex
         self.idley = idley
+        self.clock = pygame.time.Clock()
+        self.time = self.clock.tick(60)
+        self.timer = 0
         self.Health = 100
         self.MaxHealth = 100
         self.Healthbar = healthbar.Healthbar(1500, 250, 250, 25, self.MaxHealth)
@@ -80,4 +83,11 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (self.ImageWIDTH * 12, self.ImageHEIGTH * 12))
         self.filpimage = pygame.transform.flip(self.image, True, False)
         mainscreen.blit(self.filpimage, (self.Rect.x, self.Rect.y))
+
+    def enemyTimer(self):
+        self.timer += self.time
+        self.timerS = self.timer / 1000
+        if self.timerS >= self.TIMERMAXTIME:
+            self.timer = 0
+            return True
 
