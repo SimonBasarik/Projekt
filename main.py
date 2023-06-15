@@ -1,3 +1,5 @@
+import math
+
 import pygame, json, random
 from pytmx.util_pygame import load_pygame
 import hrac, button, enemy, healthbar, obchodnik
@@ -39,6 +41,7 @@ def renderShop():
     global sidebar
     global trader1
     global trader2
+    global Bussinessman_sprites
 
 
     mouse = pygame.mouse.get_pos()
@@ -53,9 +56,9 @@ def renderShop():
         sidebar = True
     if shopexit.draw(mainscreen):
         gamelevel = player.gamelevel
+        player.pos.y += 50
         shop = False
         sidebar = False
-        player.pos.y += 150
 
     if sidebar:
         buybutton.draw(mainscreen)
@@ -402,6 +405,9 @@ menu = True
 gamelevel = 1
 fight = False
 checklevels()
+last_trader_pos = [-1, -1]
+trader1 = None
+
 while running:
     mainscreen.fill((0, 0, 0))
     floorGroup.draw(mainscreen)
@@ -422,11 +428,13 @@ while running:
             fight = True
 
     for i in Bussinessman_sprites:
+        last_trader_pos = [i.rect.x, i.rect.y]
         trader = pygame.sprite.collide_mask(player, i)
         if trader:
             trader1 = i
             trader2 = i.image
             shop = True
+            Bussinessman_sprites.remove(i)
 
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_ESCAPE]:
@@ -437,6 +445,11 @@ while running:
     else:
 
         if not fight and not shop:
+            if last_trader_pos[0] != -1 and last_trader_pos[1] != -1:
+                distance_trader = math.dist(player.pos, last_trader_pos)
+                if distance_trader > 50 and trader1 and trader1 not in Bussinessman_sprites:
+                    Bussinessman_sprites.add(trader1)
+
             if gamelevel == 1:
                 renderLevel1()
 
