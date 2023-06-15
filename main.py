@@ -9,6 +9,7 @@ pygame.init()
 res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
+clock = pygame.time.Clock()
 
 gej2 = None
 enemy = None
@@ -48,7 +49,18 @@ coin_img = pygame.image.load("png\\coin_anim_f0.png").convert_alpha()
 coin_height = coin_img.get_rect().height
 coin_width = coin_img.get_rect().width
 coin_img = pygame.transform.scale(coin_img,(coin_width*6,coin_height*6))
-clock = pygame.time.Clock()
+statMbcg = pygame.image.load("png\\menubcg.png").convert_alpha()
+menubcg_width = statMbcg.get_rect().width
+menubcg_height = statMbcg.get_rect().height
+statMbcg = pygame.transform.scale(statMbcg, (menubcg_width * 3, menubcg_height * 3))
+startMbcg = pygame.image.load("png\\startbcg.png").convert_alpha()
+startbcg_width = startMbcg.get_rect().width
+startbcg_height = startMbcg.get_rect().height
+startMbcg = pygame.transform.scale(startMbcg, (startbcg_width * 3, startbcg_height * 3))
+pauseMbcg = pygame.image.load("png\\menupbckg.png").convert_alpha()
+pausebcg_width = pauseMbcg.get_rect().width
+pausebcg_height = pauseMbcg.get_rect().height
+pauseMbcg = pygame.transform.scale(pauseMbcg, (pausebcg_width * 3, pausebcg_height * 3))
 
 sidebar = False
 heal = False
@@ -122,15 +134,14 @@ def renderShop():
 
 # funkcia renderMenu(), vykresluje menu
 
-def renderMenu():
+def renderStartMenu():
     global gamelevel
     global menu
     global running
 
     mouse = pygame.mouse.get_pos()
-
     mainscreen.fill((0, 0, 0))
-
+    mainscreen.blit(startMbcg, (0, 0))
 
     #vykreslenie tlacidiel
 
@@ -146,6 +157,76 @@ def renderMenu():
 
     pygame.display.flip()
 
+# funkcia renderStats, vykresli zakladne statistiky
+
+def renderStats():
+    global SMenu
+    global Pmenu
+
+    mouse = pygame.mouse.get_pos()
+
+    mainscreen.fill((0, 0, 0))
+    mainscreen.blit(statMbcg, (0, 0))
+
+    healthnum = button.Button(1400, 280, str(player.Health), 45)
+    HPtext = button.Button(400, 280, "HEALTH", 45)
+    mananum = button.Button(1400, 480, str(player.Mana), 45)
+    MPtext = button.Button(400, 480, "MANA", 45)
+    scorenum = button.Button(1400, 670, str(player.score), 45)
+    Scoretext = button.Button(400, 670, "SCORE", 45)
+    levelnum = button.Button(1400, 860, str(player.gamelevel), 45)
+    Leveltext = button.Button(400, 860, "LEVEL", 45)
+
+    HPtext.draw(mainscreen)
+    MPtext.draw(mainscreen)
+    Scoretext.draw(mainscreen)
+    Leveltext.draw(mainscreen)
+    healthnum.draw(mainscreen)
+    mananum.draw(mainscreen)
+    scorenum.draw(mainscreen)
+    levelnum.draw(mainscreen)
+
+    #vykreslenie tlacidiel
+
+    if backstatButton.draw(mainscreen):
+        SMenu = False
+        Pmenu = True
+
+
+    mainscreen.blit(cursor, mouse)
+
+    pygame.display.flip()
+
+# funkcia renderPauseMenu(), vykresluje pause menu pri stlaceni klavese ESC
+
+def renderPauseMenu():
+    global gamelevel
+    global Pmenu
+    global SMenu
+    global running
+
+    mouse = pygame.mouse.get_pos()
+
+    mainscreen.fill((0, 0, 0))
+    mainscreen.blit(pauseMbcg, (0, 0))
+
+    #vykreslenie tlacidiel
+
+    if resumeButton.draw(mainscreen):
+        gamelevel = player.gamelevel
+        Pmenu = False
+
+    if quitButton.draw(mainscreen):
+        writedata()
+        running = False
+
+    if statsButton.draw(mainscreen):
+        SMenu = True
+        Pmenu = False
+
+    mainscreen.blit(cursor, mouse)
+
+    pygame.display.flip()
 # funkcia renderLevel1(), vykresluje hraca a enemy
 
 def renderLevel1():
@@ -444,8 +525,11 @@ class Walls(pygame.sprite.Sprite):
 
 # Vytvorenie objektov z classy Button(), nastavenie parametrov (x, y, text tlacitka, velkost fontu)
 
-startButton = button.Button(775,400,"START", 60)
-quitButton = button.Button(815,600,"QUIT",60)
+startButton = button.Button(800,400,"START", 60)
+statsButton = button.Button(800,800,"STATS",60)
+backstatButton = button.Button(780,1000,"<- BACK",60)
+resumeButton = button.Button(765,400,"RESUME",60)
+quitButton = button.Button(835,600,"QUIT",60)
 attackButton = button.Button(150, 720, "ATTACK", 60)
 fireballButton = button.Button(150, 720, "FIREBALL", 60)
 frostfangButton = button.Button(150, 870, "FROSTFANG", 60)
@@ -574,6 +658,8 @@ def checklevels():
 shop = False
 running = True
 menu = True
+Pmenu = False
+SMenu = False
 gamelevel = 1
 fight = False
 checklevels()
@@ -615,12 +701,15 @@ while running:
 
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_ESCAPE]:
-        menu = True
+        Pmenu = True
 
     if menu:
-        renderMenu()
-    else:
-
+        renderStartMenu()
+    elif Pmenu:
+        renderPauseMenu()
+    elif SMenu:
+        renderStats()
+    if not menu and not Pmenu and not SMenu:
         if not fight and not shop:
             if last_trader_pos[0] != -1 and last_trader_pos[1] != -1:
                 distance_trader = math.dist(player.pos, last_trader_pos)
