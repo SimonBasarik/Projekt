@@ -9,6 +9,7 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
 
         # enemy premenne
+
         self.TIMERMAXTIME = TIMERMAXTIME
         self.enemyFireResistance = enemyFireResistance
         self.enemyIceResistance = enemyIceResistance
@@ -31,6 +32,9 @@ class Enemy(pygame.sprite.Sprite):
         # player sprite nacitanie do listu
 
         self.sprites = []
+
+        #zistenie typu enemy a nacitanie spravneho obrazku
+
         if enemyType == 1:
             for i in range(4):
                 self.sprites.append(pygame.image.load(f"sprites\\goblin\\goblin_idle_anim_f{i}.png").convert_alpha())

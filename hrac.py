@@ -1,8 +1,5 @@
 import pygame, healthbar
 
-# maximalny cas timeru
-
-TIMERMAXTIME = 1
 
 class Player(pygame.sprite.Sprite):
 
@@ -12,10 +9,13 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         # player premenne
+        self.TIMERMAXTIME = 1
         self.obstacles = obstacles
         self.PLAYER_SPEED = 6
         self.Health = 100
         self.MaxHealth = 100
+        self.Mana = 20
+        self.MaxMana = 20
         self.Healthbar = healthbar.Healthbar(300, 215, 250, 25, self.MaxHealth)
         self.Ressistance = 0
         self.timer = 0
@@ -179,8 +179,16 @@ class Player(pygame.sprite.Sprite):
     def drawtimer(self,mainscreen):
         timerS = self.timer / 1000
 
-        ratio = min(timerS / TIMERMAXTIME, 1)
+        ratio = min(timerS / self.TIMERMAXTIME, 1)
 
         pygame.draw.rect(mainscreen, "black", (1550, 720, 250, 55))
         pygame.draw.rect(mainscreen, "white", (1550, 720, 250 * ratio, 55))
+
+    # metoda drawMP, vykresluje mana bar vo fighte
+
+    def drawMP(self,mainscreen):
+
+        ratio = self.Mana / self.MaxMana
+        pygame.draw.rect(mainscreen, "black", (1550, 785, 250, 55))
+        pygame.draw.rect(mainscreen, (114,214,206), (1550, 785, 250 * ratio, 55))
 

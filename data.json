@@ -603,6 +603,116 @@
          "health": 20,
          "score": 0,
          "Game level": 1
+      },
+      {
+         "health": 90,
+         "score": 1,
+         "Game level": 2
+      },
+      {
+         "health": 95,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 40,
+         "score": 2,
+         "Game level": 2
+      },
+      {
+         "health": 55,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 65,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 65,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 20,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 80,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 100,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 70,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 90,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 95,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 90,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 95,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 100,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 90,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 90,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 65,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 85,
+         "score": 1,
+         "Game level": 1
+      },
+      {
+         "health": 60,
+         "score": 1,
+         "Game level": 1
+      },
+      {
+         "health": 75,
+         "score": 0,
+         "Game level": 1
+      },
+      {
+         "health": 75,
+         "score": 0,
+         "Game level": 1
       }
    ]
 }

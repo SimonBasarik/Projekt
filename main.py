@@ -1,6 +1,6 @@
 import pygame, json,math
 from pytmx.util_pygame import load_pygame
-import hrac, button, enemy, healthbar, obchodnik
+import hrac, button, nepriatel, healthbar, obchodnik
 
 pygame.init()
 
@@ -10,13 +10,16 @@ res = (1920, 1080)  # rozlisenie
 
 mainscreen = pygame.display.set_mode(res)
 
+gej2 = None
+enemy = None
+
+# nacitanie levelov z .tmx do premennych
+
 level1 = load_pygame("levely\\level1.tmx")
 level2 = load_pygame("levely\\level2.tmx")
 
-gej2 = None
-eenemy = None
 
-
+#transformovanie obrazkov
 
 pygame.mouse.set_visible(False)
 cursor = pygame.image.load('slick_arrow-delta.png').convert_alpha()
@@ -66,7 +69,7 @@ def renderShop():
 
     pygame.display.flip()
 
-# funkcia renderMenu(, vykresluje menu
+# funkcia renderMenu(), vykresluje menu
 
 def renderMenu():
     global gamelevel
@@ -78,7 +81,7 @@ def renderMenu():
     mainscreen.fill((0, 0, 0))
 
 
-
+    #vykreslenie tlacidiel
 
     if startButton.draw(mainscreen):
         gamelevel = player.gamelevel
@@ -92,14 +95,14 @@ def renderMenu():
 
     pygame.display.flip()
 
-# funkcia renderMainG(), vykresluje hraca a enemy
+# funkcia renderLevel1(), vykresluje hraca a enemy
 
 def renderLevel1():
 
     # vykreslenie hraca a animacia
 
     global gej2
-    global eenemy
+    global enemy
     global gamelevel
 
     moving_sprites.draw(mainscreen)
@@ -110,6 +113,8 @@ def renderLevel1():
 
     pygame.display.flip()
     clock.tick(60)
+
+    #kontrola kedy sa prepne level na 2
 
     if player.pos.y > res[1]:
         for wall in wallGroup:
@@ -122,13 +127,15 @@ def renderLevel1():
         loadlevel2()
         player.pos.y = 50
 
+# funkcia renderLevel2(), vykresluje hraca a enemy
+
 def renderLevel2():
 
 
     # vykreslenie hraca a animacia
 
     global gej2
-    global eenemy
+    global enemy
 
     moving_sprites.draw(mainscreen)
     moving_sprites.update()
@@ -143,6 +150,7 @@ def renderLevel2():
     clock.tick(60)
 
 # funkcia renderfight(), vykresluje a stara sa o hlavne vlastnosti suboja
+
 draw_mainButtons = True
 draw_magicButtons = False
 draw_itemButtons = False
@@ -154,55 +162,67 @@ def renderfight():
     global gamelevel
     global gej1
     global gej2
-    global eenemy
+    global enemy
     global fight
+
+    # nastavenie mysi a fill obrazovky
 
     mouse = pygame.mouse.get_pos()
     mainscreen.fill((28, 28, 28))
+
+    # casovac hraca
+
     time = clock.tick(60)
     player.timer += time
     timerS = player.timer / 1000
+
+    # blit pozadie fightu (to pozadie za tlacidlami)
+
     mainscreen.blit(fight_img, (0, 0))
+
+    #nastavenie nepriatelskych objektov do premennej enemy
 
     player.updateIdle(mainscreen)
     if gej2 == goblin.image:
-        eenemy = goblin
+        enemy = goblin
     if gej2 == demon.image:
-        eenemy = demon
+        enemy = demon
     if gej2 == muddy.image:
-        eenemy = muddy
+        enemy = muddy
     if gej2 == chort.image:
-        eenemy = chort
+        enemy = chort
     if gej2 == bigzombie.image:
-        eenemy = bigzombie
+        enemy = bigzombie
 
-    if not eenemy:
-        gamelevel = player.gamelevels
+    if not enemy:
+        gamelevel = player.gamelevel
         return
 
-    eenemy.updateIdle(mainscreen)
+    #vykreslenie nepriatela
 
-    if eenemy.enemyTimer():
-        eenemy.enemyAttack -= player.Ressistance
-        player.Health -= eenemy.enemyAttack
-        eenemy.enemyAttack += player.Ressistance
+    enemy.updateIdle(mainscreen)
+
+    # casovac utokov nepriatela
+
+    if enemy.enemyTimer():
+        enemy.enemyAttack -= player.Ressistance
+        player.Health -= enemy.enemyAttack
+        enemy.enemyAttack += player.Ressistance
         player.Ressistance = 0
 
-    # volanie funkcii tlacidiel
+    # vykreslovanie hlavnych tlacidiel, a ich funkcie
 
     if draw_mainButtons:
         if attackButton.draw(mainscreen):
             if timerS >= hrac.TIMERMAXTIME:
-                eenemy.Health -= 10
+                enemy.Health -= 10
                 player.timer = 0
-                # enemyTurn()
 
         if defendButton.draw(mainscreen):
             if timerS >= hrac.TIMERMAXTIME:
                 player.Ressistance = 4
-                # enemyTurn()
-
                 player.timer = 0
+
         if magicButton.draw(mainscreen):
             draw_mainButtons = False
             draw_magicButtons = True
@@ -210,38 +230,53 @@ def renderfight():
             draw_mainButtons = False
             draw_itemButtons = True
     timerText.draw(mainscreen)
+    manaText.draw(mainscreen)
+
+    # vykreslovanie magic tlacidiel, a ich funkcie
+
     if draw_magicButtons == True:
         if fireballButton.draw(mainscreen):
-            if timerS >= hrac.TIMERMAXTIME:
-                damage = 20 - eenemy.enemyFireResistance
-                eenemy.Health -= damage
+            if timerS >= hrac.TIMERMAXTIME and player.Mana >= 5:
+                damage = 20 - enemy.enemyFireResistance
+                player.Mana -= 5
+                enemy.Health -= damage
                 player.timer = 0
-                # enemyTurn()
+
         if frostfangButton.draw(mainscreen):
-            if timerS >= hrac.TIMERMAXTIME:
-                damage = 20 - eenemy.enemyIceResistance
-                eenemy.Health -= damage
+            if timerS >= hrac.TIMERMAXTIME and player.Mana >= 5:
+                damage = 20 - enemy.enemyIceResistance
+                player.Mana -= 5
+                enemy.Health -= damage
                 player.timer = 0
-                # enemyTurn()
+
         if backbutton.draw(mainscreen):
             draw_magicButtons = False
             draw_mainButtons = True
+
+    # vykreslovanie item tlacidiel, a ich funkcie
+
     if draw_itemButtons == True:
+
         if manapotion.draw(mainscreen):
-            pass
+            if timerS >= hrac.TIMERMAXTIME:
+                player.Mana += 10
+                player.timer = 0
         if healpotion.draw(mainscreen):
-            player.Health += 20
-            if player.Health > player.MaxHealth:
-                player.Health = player.MaxHealth
+            if timerS >= hrac.TIMERMAXTIME:
+                player.Health += 20
+                player.timer = 0
+                if player.Health > player.MaxHealth:
+                    player.Health = player.MaxHealth
         if backbutton.draw(mainscreen):
             draw_itemButtons = False
             draw_mainButtons = True
             player.timer = 0
-            # enemyTurn()
 
     # vykreslenie HealthBaru
-    eenemy.Healthbar.draw(mainscreen, eenemy.Health)
+
+    enemy.Healthbar.draw(mainscreen, enemy.Health)
     player.Healthbar.draw(mainscreen, player.Health)
+    player.drawMP(mainscreen)
     player.drawtimer(mainscreen)
     mainscreen.blit(cursor, mouse)
 
@@ -253,15 +288,15 @@ def renderfight():
         gamelevel = player.gamelevel
         fight = False
         player.Health = 20
-        eenemy.Health = 100
+        enemy.Health = 100
 
     #smrt nepriatela
 
-    if eenemy.Health <= 0:
+    if enemy.Health <= 0:
         player.score += 1
         gamelevel = player.gamelevel
         fight = False
-        eenemy = None
+        enemy = None
         pygame.sprite.Sprite.kill(gej1)
 
 
@@ -304,9 +339,10 @@ defendButton = button.Button(150, 870, "DEFEND", 60)
 magicButton = button.Button(700, 720, "MAGIC", 60)
 itemButton = button.Button(700, 870, "ITEM", 60)
 timerText = button.Button(1250, 720, "TIMER:", 45)
+manaText = button.Button(1280,790,"MANA:",45)
 healpotion = button.Button(150, 720, "HEALPOTION", 60)
 manapotion = button.Button(150, 870, "MANAPOTION", 60)
-backbutton = button.Button(1300,870,"<- BACK",45)
+backbutton = button.Button(1300,900,"<- BACK",45)
 buybutton = button.Button(1300,850,"BUY",60)
 sellbutton = button.Button(1600,850,"SELL",60)
 shopexit = button.Button(100,850,"LEAVE", 50)
@@ -329,11 +365,11 @@ moving_sprites.add(player)
 # Vytvorenie enemies z classy Enemy(posx,posy,enemytype,sila utoku, x pozicia pri suboju, y pozicia pri suboju, fire resistance, ice resistance)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = enemy.Enemy(960, 950, 1, 5, 1500, 300,0,0,0.5)
-demon = enemy.Enemy(760, 750, 2, 15, 1400, 200,15,-5,0.5)
-bigzombie = enemy.Enemy(660, 650, 3, 15, 1400, 200,5,5,0.5)
-muddy = enemy.Enemy(560, 560, 5, 10, 1500, 300,5,0,0.5)
-chort = enemy.Enemy(960, 750, 4, 5, 1500, 300,5,-5,0.5)
+goblin = nepriatel.Enemy(960, 950, 1, 5, 1500, 300,0,0,1.5)
+demon = nepriatel.Enemy(760, 750, 2, 15, 1400, 200,15,-5,2.2)
+bigzombie = nepriatel.Enemy(660, 650, 3, 15, 1400, 200,5,5,2.2)
+muddy = nepriatel.Enemy(560, 560, 5, 10, 1500, 300,5,0,2)
+chort = nepriatel.Enemy(960, 750, 4, 5, 1500, 300,5,-5,0.5)
 enemy_sprites.add(goblin)
 
 Bussinessman_sprites = pygame.sprite.Group()
@@ -344,17 +380,19 @@ Bussinessman_sprites.add(Bussinessman)
 
 playerHealthBar = healthbar.Healthbar(325, 175, 250, 25, player.MaxHealth)
 
-pipik = dict()
+# zapisanie zakladnych statistik do data.json
+
+dickt = dict()
 
 with open("data.json", "r", encoding="UTF-8") as f:
-    pipik = json.load(f)
+    dickt = json.load(f)
 
-saves = pipik["saves"]
+saves = dickt["saves"]
 
 def writedata():
     global saves
 
-    data = {"health": player.Health, "score": player.score, "Game level": player.gamelevel}
+    data = {"health": player.Health,"mana": player.Mana, "score": player.score, "game level": player.gamelevel}
 
     saves.append(data)
 
@@ -365,7 +403,7 @@ def writedata():
     with open("data.json", "w", encoding="UTF-8") as f:
         f.write(new_json)
 
-# pridanie stien a podlahy do ich vlastných groupov
+# pridanie stien a podlahy do ich vlastných groupov, a loadovanie
 
 def loadlevel2():
     for layer in level2.visible_layers:
@@ -379,6 +417,9 @@ def loadlevel2():
             for x, y, surf in layer.tiles():
                 pos = (x * 48, y * 48)
                 Walls(pos=pos, surf=surf, groups=wallGroup)
+
+# funkcia na kontrolu levelov (ktory sa ma loadnut atd.)
+
 def checklevels():
     if player.gamelevel == 1:
         for layer in level1.visible_layers:
@@ -396,8 +437,8 @@ def checklevels():
         loadlevel2()
 
 
+#premenne pre hlavny loop
 
-# main loop
 shop = False
 running = True
 menu = True
@@ -406,6 +447,8 @@ fight = False
 checklevels()
 last_trader_pos = [-1, -1]
 trader1 = None
+
+# main loop
 
 while running:
     mainscreen.fill((0, 0, 0))
@@ -417,7 +460,7 @@ while running:
             running = False
     pygame.draw.rect(mainscreen,(255,0,0),player.rect,5,1)
 
-    # enemy trigger
+    # kontrola kolizii s nepriatelmi
 
     for i in enemy_sprites:
         penis = pygame.sprite.collide_mask(player, i)
@@ -425,6 +468,8 @@ while running:
             gej1 = i
             gej2 = i.image
             fight = True
+
+    # kontrola kolizii s obchodnikom
 
     for i in Bussinessman_sprites:
         last_trader_pos = [i.rect.x, i.rect.y]
@@ -434,6 +479,8 @@ while running:
             trader2 = i.image
             shop = True
             Bussinessman_sprites.remove(i)
+
+    # kopec ifov ktore kontroluju co sa ma nacitat
 
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_ESCAPE]:
