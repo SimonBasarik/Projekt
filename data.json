@@ -725,6 +725,288 @@
          "mana": 20,
          "score": 0,
          "game level": 1
+      },
+      {
+         "health": 56,
+         "mana": 30,
+         "score": 0,
+         "game level": 1
+      },
+      {
+         "health": 20,
+         "mana": 0,
+         "score": 0,
+         "game level": 1
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 0,
+         "game level": 1
+      },
+      {
+         "health": 70,
+         "mana": 0,
+         "score": 1,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 15,
+         "score": 1,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 0,
+         "score": 1,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 0,
+         "score": 2,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 0,
+         "game level": 1
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 0,
+         "game level": 1
+      },
+      {
+         "health": 13,
+         "mana": 5,
+         "score": 2,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 0,
+         "score": 2,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 5,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 0,
+         "game level": 1
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 1
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 1
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 1
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 4,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 2
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 10,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 3,
+         "game level": 3
+      },
+      {
+         "health": 65,
+         "mana": 20,
+         "score": 5,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 2,
+         "game level": 3
+      },
+      {
+         "health": 100,
+         "mana": 20,
+         "score": 1,
+         "game level": 1
+      },
+      {
+         "health": 66,
+         "mana": 5,
+         "score": 1,
+         "game level": 2
       }
    ]
 }

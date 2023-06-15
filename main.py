@@ -17,6 +17,7 @@ enemy = None
 
 level1 = load_pygame("levely\\level1.tmx")
 level2 = load_pygame("levely\\level2.tmx")
+level3 = load_pygame("levely\\level3.tmx")
 
 
 #transformovanie obrazkov
@@ -114,17 +115,17 @@ def renderLevel1():
     pygame.display.flip()
     clock.tick(60)
 
-    #kontrola kedy sa prepne level na 2
+    # kontrola kedy sa prepne level na 2
 
     if player.pos.y > res[1]:
         for wall in wallGroup:
             wallGroup.remove(wall)
         for floor in floorGroup:
             floorGroup.remove(floor)
-        enemy_sprites.add(muddy)
+        enemy_sprites.add(muddy,demon)
         player.gamelevel = 2
         gamelevel = player.gamelevel
-        loadlevel2()
+        checklevels()
         player.pos.y = 50
 
 # funkcia renderLevel2(), vykresluje hraca a enemy
@@ -136,6 +137,45 @@ def renderLevel2():
 
     global gej2
     global enemy
+    global gamelevel
+
+    moving_sprites.draw(mainscreen)
+    moving_sprites.update()
+
+    enemy_sprites.draw(mainscreen)
+    enemy_sprites.update()
+
+    Bussinessman_sprites.draw(mainscreen)
+    Bussinessman_sprites.update()
+
+    pygame.display.flip()
+    clock.tick(60)
+
+    # kontrola kedy sa prepne level na 3
+
+    if player.pos.x > res[0]:
+        for wall in wallGroup:
+            wallGroup.remove(wall)
+        for floor in floorGroup:
+            floorGroup.remove(floor)
+
+        enemy_sprites.remove(muddy,demon)
+        enemy_sprites.add(bigzombie, chort,skeleton)
+        player.gamelevel = 3
+        gamelevel = player.gamelevel
+        checklevels()
+        player.pos.x = 70
+
+# funkcia renderLevel3(), vykresluje hraca a enemy
+
+def renderLevel3():
+
+
+    # vykreslenie hraca a animacia
+
+    global gej2
+    global enemy
+    global gamelevel
 
     moving_sprites.draw(mainscreen)
     moving_sprites.update()
@@ -193,6 +233,8 @@ def renderfight():
         enemy = chort
     if gej2 == bigzombie.image:
         enemy = bigzombie
+    if gej2 == skeleton.image:
+        enemy = skeleton
 
     if not enemy:
         gamelevel = player.gamelevel
@@ -215,7 +257,7 @@ def renderfight():
     if draw_mainButtons:
         if attackButton.draw(mainscreen):
             if timerS >= player.TIMERMAXTIME:
-                enemy.Health -= 10
+                enemy.Health -= player.attack
                 player.timer = 0
 
         if defendButton.draw(mainscreen):
@@ -261,6 +303,8 @@ def renderfight():
             if timerS >= player.TIMERMAXTIME:
                 player.Mana += 10
                 player.timer = 0
+                if player.Mana > player.MaxMana:
+                    player.Mana = player.MaxMana
         if healpotion.draw(mainscreen):
             if timerS >= player.TIMERMAXTIME:
                 player.Health += 20
@@ -283,7 +327,7 @@ def renderfight():
     # smrt hraca
 
     if player.Health <= 0:
-        player.pos.x =player
+        player.pos.x = 960
         player.pos.y = 540
         gamelevel = player.gamelevel
         fight = False
@@ -365,11 +409,12 @@ moving_sprites.add(player)
 # Vytvorenie enemies z classy Enemy(posx,posy,enemytype,sila utoku, x pozicia pri suboju, y pozicia pri suboju, fire resistance, ice resistance)
 
 enemy_sprites = pygame.sprite.Group()
-goblin = nepriatel.Enemy(960, 950, 1, 5, 1500, 300,0,0,1.5)
-demon = nepriatel.Enemy(760, 750, 2, 15, 1400, 200,15,-5,2.2)
-bigzombie = nepriatel.Enemy(660, 650, 3, 15, 1400, 200,5,5,2.2)
-muddy = nepriatel.Enemy(560, 560, 5, 10, 1500, 300,5,0,2)
-chort = nepriatel.Enemy(960, 750, 4, 5, 1500, 300,5,-5,0.5)
+goblin = nepriatel.Enemy(960, 950, 1, 5, 1500, 300,0,0,4.5)
+demon = nepriatel.Enemy(1800, 560, 2, 15, 1400, 200,15,-5,5.2)
+bigzombie = nepriatel.Enemy(1750, 555, 3, 15, 1400, 200,5,5,5.2)
+muddy = nepriatel.Enemy(560, 565, 5, 10, 1500, 300,5,0,5)
+chort = nepriatel.Enemy(960, 950, 4, 5, 1500, 300,5,-5,3.5)
+skeleton = nepriatel.Enemy(960,100,6,5,1500,300,20,20,4.5)
 enemy_sprites.add(goblin)
 
 Bussinessman_sprites = pygame.sprite.Group()
@@ -418,6 +463,19 @@ def loadlevel2():
                 pos = (x * 48, y * 48)
                 Walls(pos=pos, surf=surf, groups=wallGroup)
 
+def loadlevel3():
+    for layer in level3.visible_layers:
+        if layer.name == "ground":
+            for x, y, surf in layer.tiles():
+                pos = (x * 48, y * 48)
+                Floor(pos=pos, surf=surf, groups=floorGroup)
+
+    for layer in level3.visible_layers:
+        if layer.name == "walls":
+            for x, y, surf in layer.tiles():
+                pos = (x * 48, y * 48)
+                Walls(pos=pos, surf=surf, groups=wallGroup)
+
 # funkcia na kontrolu levelov (ktory sa ma loadnut atd.)
 
 def checklevels():
@@ -435,6 +493,9 @@ def checklevels():
                     Walls(pos=pos, surf=surf, groups=wallGroup)
     elif player.gamelevel == 2:
         loadlevel2()
+
+    elif player.gamelevel == 3:
+        loadlevel3()
 
 
 #premenne pre hlavny loop
@@ -500,6 +561,9 @@ while running:
 
             elif gamelevel == 2:
                 renderLevel2()
+
+            elif gamelevel == 3:
+                renderLevel3()
 
         if fight:
             renderfight()
