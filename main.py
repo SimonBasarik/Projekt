@@ -12,7 +12,9 @@ mainscreen = pygame.display.set_mode(res)
 
 gej2 = None
 enemy = None
-
+healAmount = 5
+manaAmount = 1
+coinAmount = 5
 # nacitanie levelov z .tmx do premennych
 
 level1 = load_pygame("levely\\level1.tmx")
@@ -31,30 +33,56 @@ shop_img = pygame.image.load("png\\SHOP.png").convert_alpha()
 shop_height = shop_img.get_rect().height
 shop_width = shop_img.get_rect().width
 shop_img = pygame.transform.scale(shop_img,(shop_width*3,shop_height*3))
-
+health_img = pygame.image.load("png\\flask_big_red.png").convert_alpha()
+health_height = health_img.get_rect().height
+health_width = health_img.get_rect().width
+health_img = pygame.transform.scale(health_img,(health_width*24,health_height*24))
+health_imgfight = pygame.transform.scale(health_img,(health_width*6,health_height*6))
+mana_img = pygame.image.load("png\\flask_big_blue.png").convert_alpha()
+mana_height = mana_img.get_rect().height
+mana_width = mana_img.get_rect().width
+mana_img = pygame.transform.scale(mana_img,(mana_width*24,mana_height*24))
+mana_imgfight = pygame.transform.scale(mana_img,(mana_width*6,mana_height*6))
+coin_img = pygame.image.load("png\\coin_anim_f0.png").convert_alpha()
+coin_height = coin_img.get_rect().height
+coin_width = coin_img.get_rect().width
+coin_img = pygame.transform.scale(coin_img,(coin_width*6,coin_height*6))
 clock = pygame.time.Clock()
 
 sidebar = False
+heal = False
+mana = False
 
 def renderShop():
     global gamelevel
+    global healAmount
+    global manaAmount
+    global coinAmount
     global shop
     global sidebar
     global trader1
     global trader2
     global Bussinessman_sprites
+    global heal
+    global mana
 
 
     mouse = pygame.mouse.get_pos()
     mainscreen.fill((0, 0, 0))
     mainscreen.blit(shop_img,(0,0))
     shopSHOP.draw(mainscreen)
-
+    mainscreen.blit(coin_img,(1650,150))
+    coin_shop = button.Button(1700, 150, str(coinAmount), 45)
+    coin_shop.draw(mainscreen)
 
     if shopHEAL.draw(mainscreen):
         sidebar = True
+        heal = True
+        mana = False
     if shopMANA.draw(mainscreen):
         sidebar = True
+        mana = True
+        heal = False
     if shopexit.draw(mainscreen):
         gamelevel = player.gamelevel
         player.pos.y += 50
@@ -62,8 +90,30 @@ def renderShop():
         sidebar = False
 
     if sidebar:
-        buybutton.draw(mainscreen)
-        sellbutton.draw(mainscreen)
+        if heal:
+            mainscreen.blit(health_img,(1400,300))
+            if coinAmount > 1:
+                if buybutton.draw(mainscreen):
+                    healAmount += 1
+                    coinAmount -= 2
+            if healAmount > 0:
+                if sellbutton.draw(mainscreen):
+                    coinAmount += 1
+                    healAmount -= 1
+
+        if mana:
+            mainscreen.blit(mana_img, (1400, 300))
+            if coinAmount > 4:
+                if buybutton.draw(mainscreen):
+                    manaAmount += 1
+                    coinAmount -= 5
+            if manaAmount > 0:
+                if sellbutton.draw(mainscreen):
+                    coinAmount += 2
+                    manaAmount -= 1
+
+
+
 
     mainscreen.blit(cursor, mouse)
 
@@ -160,6 +210,11 @@ def renderfight():
     global draw_magicButtons
     global draw_itemButtons
     global gamelevel
+    global manaAmount
+    global healAmount
+    global coinAmount
+    global health_imgfight
+    global mana_imgfight
     global gej1
     global gej2
     global enemy
@@ -213,6 +268,12 @@ def renderfight():
     # vykreslovanie hlavnych tlacidiel, a ich funkcie
 
     if draw_mainButtons:
+        manafight = button.Button(1400, 900, str(manaAmount), 45)
+        healfight = button.Button(1600, 900, str(healAmount), 45)
+        healfight.draw(mainscreen)
+        mainscreen.blit(health_imgfight,(1500,880))
+        manafight.draw(mainscreen)
+        mainscreen.blit(mana_imgfight,(1300,880))
         if attackButton.draw(mainscreen):
             if timerS >= player.TIMERMAXTIME:
                 enemy.Health -= 10
@@ -259,12 +320,20 @@ def renderfight():
 
         if manapotion.draw(mainscreen):
             if timerS >= player.TIMERMAXTIME:
-                player.Mana += 10
-                player.timer = 0
+                if manaAmount <= 0:
+                    player.Mana += 0
+                else:
+                    player.Mana += 10
+                    player.timer = 0
+                    manaAmount -= 1
         if healpotion.draw(mainscreen):
             if timerS >= player.TIMERMAXTIME:
-                player.Health += 20
-                player.timer = 0
+                if healAmount <= 0:
+                    player.Health += 0
+                else:
+                    player.Health += 20
+                    player.timer = 0
+                    healAmount -= 1
                 if player.Health > player.MaxHealth:
                     player.Health = player.MaxHealth
         if backbutton.draw(mainscreen):
@@ -294,6 +363,7 @@ def renderfight():
 
     if enemy.Health <= 0:
         player.score += 1
+        coinAmount += 4
         gamelevel = player.gamelevel
         fight = False
         enemy = None
@@ -343,13 +413,14 @@ manaText = button.Button(1280,790,"MANA:",45)
 healpotion = button.Button(150, 720, "HEALPOTION", 60)
 manapotion = button.Button(150, 870, "MANAPOTION", 60)
 backbutton = button.Button(1300,900,"<- BACK",45)
-buybutton = button.Button(1300,850,"BUY",60)
-sellbutton = button.Button(1600,850,"SELL",60)
-shopexit = button.Button(100,850,"LEAVE", 50)
+buybutton = button.Button(1320,850,"BUY",60)
+sellbutton = button.Button(1580,850,"SELL",60)
+shopexit = button.Button(110,850,"LEAVE", 50)
 shopSHOP = button.Button(770,150,"SHOP", 120)
-shopHEAL = button.Button(100,150,"HEALPOTION", 50)
-shopMANA = button.Button(100,250,"MANAPOTION", 50)
-shopSWORD = button.Button(300,850,"EXIT", 60)
+shopHEAL = button.Button(110,150,"HEALPOTION", 50)
+shopMANA = button.Button(110,250,"MANAPOTION", 50)
+shopSWORD = button.Button(110,900,"EXIT", 60)
+
 
 # Vytvorenie floor, a wall group, neskôr v kóde sa do nich pridajú jednotlivé tily
 
