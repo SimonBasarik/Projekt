@@ -725,6 +725,12 @@
          "mana": 20,
          "score": 0,
          "game level": 1
+      },
+      {
+         "health": 25,
+         "mana": 0,
+         "score": 6,
+         "game level": 3
       }
    ]
 }
