@@ -61,10 +61,16 @@ pauseMbcg = pygame.image.load("png\\menupbckg.png").convert_alpha()
 pausebcg_width = pauseMbcg.get_rect().width
 pausebcg_height = pauseMbcg.get_rect().height
 pauseMbcg = pygame.transform.scale(pauseMbcg, (pausebcg_width * 3, pausebcg_height * 3))
+userInBcg = pygame.image.load("png\\userInBcg.png").convert_alpha()
+userInBcg_width = userInBcg.get_rect().width
+userInBcg_height = userInBcg.get_rect().height
+userInBcg = pygame.transform.scale(userInBcg, (userInBcg_width * 3, userInBcg_height * 3))
 
 sidebar = False
 heal = False
 mana = False
+
+# funkcia renderShop(), pri dotyku s obchodnikom sa spusti
 
 def renderShop():
     global gamelevel
@@ -87,6 +93,8 @@ def renderShop():
     mainscreen.blit(coin_img,(1650,150))
     coin_shop = button.Button(1700, 150, str(coinAmount), 45)
     coin_shop.draw(mainscreen)
+
+    # vykreslenie tlacidiel
 
     if shopHEAL.draw(mainscreen):
         sidebar = True
@@ -132,12 +140,41 @@ def renderShop():
 
     pygame.display.flip()
 
+# funkcia textInputRender(), vykresluje menu v ktorom zadavame username
+
+def textInputRender():
+
+    global username
+    global usernMenu
+    global gamelevel
+
+    mouse = pygame.mouse.get_pos()
+    mainscreen.fill((0, 0, 0))
+    mainscreen.blit(userInBcg, (0, 0))
+
+    font = pygame.font.Font('Font\\Wizard.ttf', 45)
+
+    input_rect = pygame.Rect(1000,615,455,70)
+
+    if startButton.draw(mainscreen) and username != "":
+        gamelevel = player.gamelevel
+        usernMenu = False
+
+    pygame.draw.rect(mainscreen,(255,255,255),input_rect,5)
+    textsurf = font.render(username, True, (255, 255, 255))
+    mainscreen.blit(font.render("USERNAME:",True,(255,255,255)),(450,625))
+    mainscreen.blit(textsurf,(input_rect.x + 10, input_rect.y + 10))
+    mainscreen.blit(cursor, mouse)
+
+    pygame.display.flip()
+
 # funkcia renderMenu(), vykresluje menu
 
 def renderStartMenu():
     global gamelevel
     global menu
     global running
+    global usernMenu
 
     mouse = pygame.mouse.get_pos()
     mainscreen.fill((0, 0, 0))
@@ -146,11 +183,10 @@ def renderStartMenu():
     #vykreslenie tlacidiel
 
     if startButton.draw(mainscreen):
-        gamelevel = player.gamelevel
         menu = False
+        usernMenu = True
 
     if quitButton.draw(mainscreen):
-        writedata()
         running = False
 
     mainscreen.blit(cursor, mouse)
@@ -592,13 +628,23 @@ saves = dickt["saves"]
 def writedata():
     global saves
 
-    data = {"health": player.Health,"mana": player.Mana, "score": player.score, "game level": player.gamelevel}
+    if username in saves:
+        user_saves = saves[username]
+        for save in user_saves:
+            save["health"] = player.Health
+            save["mana"] = player.Mana
+            save["score"] = player.score
+            save["game level"] = player.gamelevel
+    else:
+        new_save = {
+            "health": player.Health,
+            "mana": player.Mana,
+            "score": player.score,
+            "game level": player.gamelevel
+        }
+        saves[username] = [new_save]
 
-    saves.append(data)
-
-    new_data = {"saves": saves}
-
-    new_json = json.dumps(new_data, indent=3)
+    new_json = json.dumps(dickt, indent=3)
 
     with open("data.json", "w", encoding="UTF-8") as f:
         f.write(new_json)
@@ -653,8 +699,10 @@ def checklevels():
         loadlevel3()
 
 
-#premenne pre hlavny loop
+# premenne pre hlavny loop
 
+username = ""
+usernMenu = False
 shop = False
 running = True
 menu = True
@@ -676,6 +724,12 @@ while running:
         if event.type == pygame.QUIT:
             writedata()
             running = False
+
+        if event.type == pygame.KEYDOWN and usernMenu:
+            if event.key == pygame.K_BACKSPACE:
+                username = username[:-1]
+            elif len(username) <= 10:
+                username += event.unicode
 
     # kontrola kolizii s nepriatelmi
 
@@ -702,14 +756,15 @@ while running:
     pressed = pygame.key.get_pressed()
     if pressed[pygame.K_ESCAPE]:
         Pmenu = True
-
     if menu:
         renderStartMenu()
+    elif usernMenu:
+        textInputRender()
     elif Pmenu:
         renderPauseMenu()
     elif SMenu:
         renderStats()
-    if not menu and not Pmenu and not SMenu:
+    if not menu and not Pmenu and not SMenu and not usernMenu:
         if not fight and not shop:
             if last_trader_pos[0] != -1 and last_trader_pos[1] != -1:
                 distance_trader = math.dist(player.pos, last_trader_pos)
