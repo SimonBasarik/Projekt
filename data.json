@@ -4,7 +4,7 @@
          {
             "health": 75,
             "mana": 20,
-            "score": 1,
+            "score": 30,
             "game level": 2
          }
       ],
@@ -12,16 +12,24 @@
          {
             "health": 75,
             "mana": 20,
-            "score": 1,
+            "score": 20,
             "game level": 2
          }
       ],
       "Robko": [
          {
-            "health": 90,
-            "mana": 0,
-            "score": 1,
-            "game level": 2
+            "health": 40,
+            "mana": 5,
+            "score": 20,
+            "game level": 3
+         }
+      ],
+      "Rob": [
+         {
+            "health": 100,
+            "mana": 20,
+            "score": 50,
+            "game level": 3
          }
       ]
    }

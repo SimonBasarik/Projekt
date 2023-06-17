@@ -1,4 +1,4 @@
-import pygame, json,math
+import pygame, json, math
 from pytmx.util_pygame import load_pygame
 import hrac, button, nepriatel, healthbar, obchodnik
 
@@ -198,21 +198,31 @@ def renderStartMenu():
 def renderStats():
     global SMenu
     global Pmenu
+    global highscore
+    global highusername
 
     mouse = pygame.mouse.get_pos()
 
     mainscreen.fill((0, 0, 0))
     mainscreen.blit(statMbcg, (0, 0))
 
-    healthnum = button.Button(1400, 280, str(player.Health), 45)
-    HPtext = button.Button(400, 280, "HEALTH", 45)
-    mananum = button.Button(1400, 480, str(player.Mana), 45)
-    MPtext = button.Button(400, 480, "MANA", 45)
-    scorenum = button.Button(1400, 670, str(player.score), 45)
-    Scoretext = button.Button(400, 670, "SCORE", 45)
-    levelnum = button.Button(1400, 860, str(player.gamelevel), 45)
-    Leveltext = button.Button(400, 860, "LEVEL", 45)
+    highScoreText = button.Button(1180, 110, "HIGHSCORE", 60)
+    highusertext = button.Button(1300, 335, highusername, 60)
+    highscorenum = button.Button(1340, 680, str(highscore), 120)
+    youText = button.Button(390, 110, "YOU", 60)
+    healthnum = button.Button(675, 325, str(player.Health), 45)
+    HPtext = button.Button(150, 335, "HEALTH", 45)
+    mananum = button.Button(675, 525, str(player.Mana), 45)
+    MPtext = button.Button(150, 530, "MANA", 45)
+    scorenum = button.Button(675, 705, str(player.score), 45)
+    Scoretext = button.Button(150, 710, "SCORE", 45)
+    levelnum = button.Button(675, 900, str(player.gamelevel), 45)
+    Leveltext = button.Button(150, 910, "LEVEL", 45)
 
+    highScoreText.draw(mainscreen)
+    highscorenum.draw(mainscreen)
+    highusertext.draw(mainscreen)
+    youText.draw(mainscreen)
     HPtext.draw(mainscreen)
     MPtext.draw(mainscreen)
     Scoretext.draw(mainscreen)
@@ -222,7 +232,7 @@ def renderStats():
     scorenum.draw(mainscreen)
     levelnum.draw(mainscreen)
 
-    #vykreslenie tlacidiel
+    # vykreslenie tlacidiel
 
     if backstatButton.draw(mainscreen):
         SMenu = False
@@ -523,7 +533,7 @@ def renderfight():
     #smrt nepriatela
 
     if enemy.Health <= 0:
-        player.score += 1
+        player.score += 10
         coinAmount += 4
         gamelevel = player.gamelevel
         fight = False
@@ -563,7 +573,7 @@ class Walls(pygame.sprite.Sprite):
 
 startButton = button.Button(800,400,"START", 60)
 statsButton = button.Button(800,800,"STATS",60)
-backstatButton = button.Button(780,1000,"<- BACK",60)
+backstatButton = button.Button(740,1010,"<- BACK",60)
 resumeButton = button.Button(765,400,"RESUME",60)
 quitButton = button.Button(835,600,"QUIT",60)
 attackButton = button.Button(150, 720, "ATTACK", 60)
@@ -649,6 +659,22 @@ def writedata():
     with open("data.json", "w", encoding="UTF-8") as f:
         f.write(new_json)
 
+# funkcia findHighscore(), hlada najvyssie nahrane score a meno hraca ktory ho nahral
+
+def findHighscore():
+    global saves
+    global highscore
+    global highusername
+
+    for user, user_saves in saves.items():
+        for save in user_saves:
+
+            value = save["score"]
+
+            if value > highscore:
+                highscore = value
+                highusername = user
+
 # pridanie stien a podlahy do ich vlastných groupov, a loadovanie
 
 def loadlevel2():
@@ -700,7 +726,8 @@ def checklevels():
 
 
 # premenne pre hlavny loop
-
+highscore = float("-inf")
+highusername = ""
 username = ""
 usernMenu = False
 shop = False
@@ -716,13 +743,18 @@ trader1 = None
 
 # main loop
 
+findHighscore()
+print(highscore)
+print(highusername)
+
 while running:
     mainscreen.fill((0, 0, 0))
     floorGroup.draw(mainscreen)
     wallGroup.draw(mainscreen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            writedata()
+            if username != "":
+                writedata()
             running = False
 
         if event.type == pygame.KEYDOWN and usernMenu:
