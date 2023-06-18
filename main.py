@@ -1,3 +1,12 @@
+
+'''
+Spagety je hra vytvorená pomocou programovacieho jazyka python.
+Využíva knižnicu pygame a pyTMX. Má RPG elementy a turn based combat na štýl Final Fantasy VII alebo Pokémon.
+Hra ukladá základné štatistiky pod hráčom zvoleným username do JSON súboru.
+Z JSON súboru sa vyberá najlepší hráč s najlepším skóre ktoré sa vykresľuje v “stats“ menu, do ktorého sa dá dostať kliknutím “ESC“ a kliknutím tlačidla “STATS“.
+'''
+
+
 import pygame, json, math
 from pytmx.util_pygame import load_pygame
 import hrac, button, nepriatel, healthbar, obchodnik
@@ -144,7 +153,6 @@ def renderShop():
 
 def textInputRender():
 
-    global username
     global usernMenu
     global gamelevel
 
@@ -156,12 +164,12 @@ def textInputRender():
 
     input_rect = pygame.Rect(1000,615,455,70)
 
-    if startButton.draw(mainscreen) and username != "":
+    if startButton.draw(mainscreen) and player.username != "":
         gamelevel = player.gamelevel
         usernMenu = False
 
     pygame.draw.rect(mainscreen,(255,255,255),input_rect,5)
-    textsurf = font.render(username, True, (255, 255, 255))
+    textsurf = font.render(player.username, True, (255, 255, 255))
     mainscreen.blit(font.render("USERNAME:",True,(255,255,255)),(450,625))
     mainscreen.blit(textsurf,(input_rect.x + 10, input_rect.y + 10))
     mainscreen.blit(cursor, mouse)
@@ -638,12 +646,13 @@ saves = dickt["saves"]
 def writedata():
     global saves
 
-    if username in saves:
-        user_saves = saves[username]
+    if player.username in saves:
+        user_saves = saves[player.username]
         for save in user_saves:
             save["health"] = player.Health
             save["mana"] = player.Mana
-            save["score"] = player.score
+            if save["score"] < player.score:
+                save["score"] = player.score
             save["game level"] = player.gamelevel
     else:
         new_save = {
@@ -652,7 +661,7 @@ def writedata():
             "score": player.score,
             "game level": player.gamelevel
         }
-        saves[username] = [new_save]
+        saves[player.username] = [new_save]
 
     new_json = json.dumps(dickt, indent=3)
 
@@ -728,7 +737,6 @@ def checklevels():
 # premenne pre hlavny loop
 highscore = float("-inf")
 highusername = ""
-username = ""
 usernMenu = False
 shop = False
 running = True
@@ -744,8 +752,6 @@ trader1 = None
 # main loop
 
 findHighscore()
-print(highscore)
-print(highusername)
 
 while running:
     mainscreen.fill((0, 0, 0))
@@ -753,15 +759,15 @@ while running:
     wallGroup.draw(mainscreen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            if username != "":
+            if player.username != "":
                 writedata()
             running = False
 
         if event.type == pygame.KEYDOWN and usernMenu:
             if event.key == pygame.K_BACKSPACE:
-                username = username[:-1]
-            elif len(username) <= 10:
-                username += event.unicode
+                player.username = player.username[:-1]
+            elif len(player.username) <= 10:
+                player.username += event.unicode
 
     # kontrola kolizii s nepriatelmi
 

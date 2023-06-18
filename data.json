@@ -18,9 +18,9 @@
       ],
       "Robko": [
          {
-            "health": 40,
-            "mana": 5,
-            "score": 20,
+            "health": 100,
+            "mana": 20,
+            "score": 40,
             "game level": 3
          }
       ],
@@ -30,6 +30,14 @@
             "mana": 20,
             "score": 50,
             "game level": 3
+         }
+      ],
+      "Igor": [
+         {
+            "health": 100,
+            "mana": 20,
+            "score": 0,
+            "game level": 1
          }
       ]
    }

@@ -9,6 +9,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
 
         # player premenne
+        self.username = ""
         self.attack = 10
         self.TIMERMAXTIME = 3
         self.obstacles = obstacles
